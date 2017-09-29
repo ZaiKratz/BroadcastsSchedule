@@ -80,13 +80,6 @@ namespace BroadcastsSchedule
         private void CreateBroadcast_Click(object sender, EventArgs e)
         {
             //YoutubeStream.CreateLiveEvent(TODO, TODO, TODO);
-            ScreenCapture sc = new ScreenCapture();
-            // capture entire screen, and save it to a file
-            Image img = sc.CaptureScreen();
-            // display image in a Picture control named imageDisplay
-            this.imageDisplay.Image = img;
-            // capture this window, and save it
-            sc.CaptureWindowToFile(this.Handle, "C:\\temp2.gif", ImageFormat.Gif);
         }
     }
 }
