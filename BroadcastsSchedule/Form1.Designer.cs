@@ -40,8 +40,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.EMails_List = new System.Windows.Forms.ListBox();
             this.LecturesGrid = new System.Windows.Forms.DataGridView();
-            this.StartStream = new System.Windows.Forms.Button();
-            this.CreateBroadcast = new System.Windows.Forms.Button();
+            this.StartStreamButton = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.EndEventButton = new System.Windows.Forms.Button();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).BeginInit();
             this.SuspendLayout();
@@ -144,33 +146,48 @@
             this.LecturesGrid.Size = new System.Drawing.Size(391, 303);
             this.LecturesGrid.TabIndex = 8;
             // 
-            // StartStream
+            // StartStreamButton
             // 
-            this.StartStream.Location = new System.Drawing.Point(472, 299);
-            this.StartStream.Name = "StartStream";
-            this.StartStream.Size = new System.Drawing.Size(108, 24);
-            this.StartStream.TabIndex = 9;
-            this.StartStream.Text = "Start Stream";
-            this.StartStream.UseVisualStyleBackColor = true;
-            this.StartStream.Click += new System.EventHandler(this.StartStream_Click);
+            this.StartStreamButton.Location = new System.Drawing.Point(462, 301);
+            this.StartStreamButton.Name = "StartStreamButton";
+            this.StartStreamButton.Size = new System.Drawing.Size(108, 23);
+            this.StartStreamButton.TabIndex = 10;
+            this.StartStreamButton.Text = "Start Stream";
+            this.StartStreamButton.UseVisualStyleBackColor = true;
+            this.StartStreamButton.Click += new System.EventHandler(this.StartEvent_Click);
             // 
-            // CreateBroadcast
+            // label4
             // 
-            this.CreateBroadcast.Location = new System.Drawing.Point(472, 270);
-            this.CreateBroadcast.Name = "CreateBroadcast";
-            this.CreateBroadcast.Size = new System.Drawing.Size(108, 23);
-            this.CreateBroadcast.TabIndex = 10;
-            this.CreateBroadcast.Text = "Create Broadcast";
-            this.CreateBroadcast.UseVisualStyleBackColor = true;
-            this.CreateBroadcast.Click += new System.EventHandler(this.CreateBroadcast_Click);
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(459, 327);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "label4";
+            // 
+            // EndEventButton
+            // 
+            this.EndEventButton.Location = new System.Drawing.Point(462, 349);
+            this.EndEventButton.Name = "EndEventButton";
+            this.EndEventButton.Size = new System.Drawing.Size(108, 24);
+            this.EndEventButton.TabIndex = 12;
+            this.EndEventButton.Text = "End Stream";
+            this.EndEventButton.UseVisualStyleBackColor = true;
+            this.EndEventButton.Click += new System.EventHandler(this.EndEventButton_Click);
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
             // 
             // BroadcastsSchedule
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1021, 407);
-            this.Controls.Add(this.CreateBroadcast);
-            this.Controls.Add(this.StartStream);
+            this.Controls.Add(this.EndEventButton);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.StartStreamButton);
             this.Controls.Add(this.LecturesGrid);
             this.Controls.Add(this.EMails_List);
             this.Controls.Add(this.label3);
@@ -204,8 +221,10 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox EMails_List;
         private System.Windows.Forms.DataGridView LecturesGrid;
-        private System.Windows.Forms.Button StartStream;
-        private System.Windows.Forms.Button CreateBroadcast;
+        private System.Windows.Forms.Button StartStreamButton;
+        private System.Windows.Forms.Button EndEventButton;
+        private System.Windows.Forms.Label label4;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 

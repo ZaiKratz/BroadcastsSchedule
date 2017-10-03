@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 
@@ -7,6 +9,10 @@ namespace BroadcastsSchedule
 {
     public partial class BroadcastsSchedule : Form
     {
+        private Google.Apis.YouTube.v3.Data.LiveBroadcast CreatedBroadcast;
+        private Google.Apis.YouTube.v3.Data.LiveStream CurrentStream;
+        private Google.Apis.YouTube.v3.YouTubeService Service = YoutubeStream.AuthenticateOauth();
+
         public BroadcastsSchedule()
         {
             InitializeComponent();
@@ -14,6 +20,8 @@ namespace BroadcastsSchedule
 
         private void BroadcastsSchedule_Load(object sender, EventArgs e)
         {
+            SetLabelText("Select lecture and press \"Start Stream\" button");
+            EndEventButton.Enabled = false;
             LecturesGrid.Columns.Add("LecturesColumn", "Lectures");
 
             CalendarColumn Date = new CalendarColumn();
@@ -25,6 +33,7 @@ namespace BroadcastsSchedule
             LecturesGrid.Columns.Add(Time);
 
             UpdateCoursesList();
+
         }
 
         private void UpdateData()
@@ -70,16 +79,80 @@ namespace BroadcastsSchedule
             UpdateData();
         }
 
-        private void StartStream_Click(object sender, EventArgs e)
+        private void StartEvent_Click(object sender, EventArgs e)
         {
-            //var Service = YoutubeStream.AuthenticateOauth();
+            backgroundWorker.RunWorkerAsync();
+            
+        }            
 
-            //YoutubeStream.StartEvent(Service, TODO);
+        private void CreateLiveEventOnBackground()
+        {
+            Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = false; });
+            UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = false; });
+            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = false; });
+            SetLabelText("Creating YouTube Live Broadcast...");
+
+            string Stream = "";
+            string Name = "";
+
+            if (LecturesGrid.InvokeRequired)
+            {
+                LecturesGrid.Invoke(
+                    new Action(
+                        delegate ()
+                        {
+                            Stream = Courses_List.SelectedItem.ToString();
+                        }
+                    )
+                );
+                LecturesGrid.Invoke(
+                    new Action(
+                        delegate ()
+                        {
+                            Name = LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[0].Value.ToString();
+                        }
+                    )
+                );
+            }
+
+            CreatedBroadcast = YoutubeStream.CreateLiveEvent(
+                Service,
+                Stream,
+                Name,
+                "Smthg");
+
+            CurrentStream = YoutubeStream.GetStreamByTitle(Stream, Service);
+
+            YoutubeStream.StartEvent(Service, CreatedBroadcast.Id, CurrentStream.Id);
+
+            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = true; });
         }
 
-        private void CreateBroadcast_Click(object sender, EventArgs e)
+        public void SetLabelText(string Text)
         {
-            //YoutubeStream.CreateLiveEvent(TODO, TODO, TODO);
+            label4.BeginInvoke((MethodInvoker)delegate () { label4.Text = Text; });
+        }
+
+        private void EndEventButton_Click(object sender, EventArgs e)
+        {
+            SetLabelText("Ending Stream...");
+            YoutubeStream.EndEvent(Service, CreatedBroadcast.Id);
+            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
+            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
+            Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
+            UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
+            SetLabelText("Stream is complete. Don't forget to stop OBS stream");
+        }
+
+        private void backgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            CreateLiveEventOnBackground();
+        }
+
+        private void backgroundWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            
         }
     }
 }
