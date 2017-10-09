@@ -14,20 +14,22 @@ namespace BroadcastsSchedule
         private static string BroadcastPart = "id,snippet,contentDetails,status";
         private static string StreamPart = "id, snippet, cdn, contentDetails, status";
 
-        public static YouTubeService AuthenticateOauth()
+        public static YouTubeService AuthenticateOauth(string User)
         {
             string ClientID = "332318931456-l5ob314tvkjs593ae07f6ialut3c9560.apps.googleusercontent.com";
             string ClientSecret = "kVnZk-9oPd_t0J50qJG_wwmn";
-            string UserName = "sadovnichy95@gmail.com";
+            string UserName = User;
             string[] scopes = new string[]
             {
                 YouTubeService.Scope.Youtube,  // view and manage your YouTube account
                 YouTubeService.Scope.YoutubeForceSsl,
                 YouTubeService.Scope.Youtubepartner,
                 YouTubeService.Scope.YoutubepartnerChannelAudit,
-                YouTubeService.Scope.YoutubeReadonly,
                 YouTubeService.Scope.YoutubeUpload
             };
+
+            var credPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            credPath = System.IO.Path.Combine(credPath, ".credentials", User, "youtube.googleapis.com-dotnet.json");
 
             try
             {
@@ -38,7 +40,7 @@ namespace BroadcastsSchedule
                         scopes,
                         UserName,
                         System.Threading.CancellationToken.None,
-                        new Google.Apis.Util.Store.FileDataStore("Daimto.YouTube.Auth.Store")).Result;
+                        new Google.Apis.Util.Store.FileDataStore(credPath, true)).Result;
 
                 YouTubeService service = new YouTubeService(new YouTubeService.Initializer()
                 {
@@ -49,7 +51,7 @@ namespace BroadcastsSchedule
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
 
@@ -57,77 +59,94 @@ namespace BroadcastsSchedule
 
         public static void TestEvent(YouTubeService Service, string BroadcastId)
         {
-            LiveBroadcastsResource.TransitionRequest Testeq =
-                Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Testing,
-                BroadcastId, BroadcastPart);
-            Testeq.ExecuteAsync();
+            try
+            {
+                LiveBroadcastsResource.TransitionRequest Testeq =
+                    Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Testing,
+                    BroadcastId, BroadcastPart);
+                Testeq.ExecuteAsync();
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        public static void StartEvent(YouTubeService Service, string BroadcastId, string StreamId)
+        public static LiveBroadcast StartEvent(YouTubeService Service, string BroadcastId, string StreamId)
         {
-            var BroadcastStatus = GetBroadcast(BroadcastId, Service).Status;
-
-            Program.BSForm.SetLabelText("Checking for OBS connection...");
-            while (GetStreamByID(StreamId, Service).Status.StreamStatus != "active") 
+            LiveBroadcast Broadcast = null;
+            try
             {
-                Program.BSForm.SetLabelText("Waiting for OBS connection...");
+                var BroadcastStatus = GetBroadcast(BroadcastId, Service).Status;
+
+                Program.BSForm.SetLabelText("Checking for OBS connection...");
+                while (GetStreamByID(StreamId, Service).Status.StreamStatus != "active")
+                {
+                    Program.BSForm.SetLabelText("Waiting for OBS connection...");
+                }
+                Program.BSForm.SetLabelText("OBS connected");
+
+
+                LiveBroadcastsResource.TransitionRequest Testeq =
+                    Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Testing,
+                    BroadcastId, BroadcastPart);
+                Broadcast = Testeq.ExecuteAsync().Result;
+
+                while (GetBroadcast(BroadcastId, Service).Status.LifeCycleStatus != "testing")
+                {
+                    Program.BSForm.SetLabelText("Testing connection...");
+                }
+
+                LiveBroadcastsResource.TransitionRequest LiveReq =
+                    Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Live,
+                    BroadcastId, BroadcastPart);
+                Broadcast = LiveReq.ExecuteAsync().Result;
+
+                Program.BSForm.SetLabelText("Now You are Live!");
             }
-            Program.BSForm.SetLabelText("OBS connected");
-
-            LiveBroadcastsResource.TransitionRequest Testeq =
-                Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Testing,
-                BroadcastId, BroadcastPart);
-            Testeq.ExecuteAsync();
-
-            while (GetBroadcast(BroadcastId, Service).Status.LifeCycleStatus != "testing")
+            catch (Google.GoogleApiException e)
             {
-                Program.BSForm.SetLabelText("Testing connection...");
-            } 
-
-            LiveBroadcastsResource.TransitionRequest LiveReq =
-                Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Live,
-                BroadcastId, BroadcastPart);
-            LiveReq.ExecuteAsync();
-
-            Program.BSForm.SetLabelText("Now You are Live!");
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return Broadcast;
         }
         
 
-        public static void EndEvent(YouTubeService Service, string BroadcastId)
+        public static LiveBroadcast EndEvent(YouTubeService Service, string BroadcastId)
         {
-            LiveBroadcastsResource.TransitionRequest TransReq =
-                Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Complete,
-                BroadcastId, BroadcastPart);
-            TransReq.ExecuteAsync();
+            LiveBroadcast Broadcast = null;
+            try
+            {
+                LiveBroadcastsResource.TransitionRequest TransReq =
+                    Service.LiveBroadcasts.Transition(LiveBroadcastsResource.TransitionRequest.BroadcastStatusEnum.Complete,
+                    BroadcastId, BroadcastPart);
+                Broadcast = TransReq.ExecuteAsync().Result;
+            }
+            catch(Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return Broadcast;
         }
 
-        public static void DeleteLiveEvent(YouTubeService Service, string BroadcastId)
+        public static void DeleteEvent(YouTubeService Service, string BroadcastId)
         {
-            LiveBroadcastsResource.DeleteRequest DelTrans =
-                Service.LiveBroadcasts.Delete(BroadcastId);
-            DelTrans.ExecuteAsync();
+            try
+            {
+                LiveBroadcastsResource.DeleteRequest DelTrans =
+                    Service.LiveBroadcasts.Delete(BroadcastId);
+                DelTrans.ExecuteAsync();
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static LiveBroadcast CreateLiveEvent(YouTubeService Service, string CourseName, string Name, string Description)
         {
-            //             LiveStream Stream = new LiveStream();
-            // 
-            //             Stream.Snippet = new LiveStreamSnippet();
-            //             Stream.Snippet.Title = Name;
-            //             Stream.Snippet.Description = Description;
-            // 
-            //             Stream.Cdn = new CdnSettings();
-            //             Stream.Cdn.Format = "1080p_hfr:";
-            //             Stream.Cdn.IngestionType = "dash";
-            //             Stream.Cdn.FrameRate = "60fps";
-            //             Stream.Cdn.Resolution = "1080p";
-            //             Stream.Kind = "youtube#liveStream";
-            // 
-            //             LiveStreamsResource.InsertRequest InsertStreamRequest = Service.LiveStreams.Insert(Stream, StreamPart);
-            //             Stream = InsertStreamRequest.Execute();
-            
             var Stream = GetStreamByTitle(CourseName, Service);
-            
+
             LiveBroadcast Broadcast = new LiveBroadcast();
 
             Broadcast.Snippet = new LiveBroadcastSnippet();
@@ -145,14 +164,19 @@ namespace BroadcastsSchedule
 
             Broadcast.Kind = "youtube#liveBroadcast";
 
-            LiveBroadcastsResource.InsertRequest InsertRequest = Service.LiveBroadcasts.Insert(Broadcast, BroadcastPart);
-            Broadcast =  InsertRequest.ExecuteAsync().Result;
-            
+            try
+            {
+                LiveBroadcastsResource.InsertRequest InsertRequest = Service.LiveBroadcasts.Insert(Broadcast, BroadcastPart);
+                Broadcast = InsertRequest.ExecuteAsync().Result;
 
-            LiveBroadcastsResource.BindRequest BindRequest = Service.LiveBroadcasts.Bind(Broadcast.Id, BroadcastPart);
-            BindRequest.StreamId = Stream.Id;
-            Broadcast = BindRequest.ExecuteAsync().Result;
-            
+                LiveBroadcastsResource.BindRequest BindRequest = Service.LiveBroadcasts.Bind(Broadcast.Id, BroadcastPart);
+                BindRequest.StreamId = Stream.Id;
+                Broadcast = BindRequest.ExecuteAsync().Result;
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return Broadcast;
         }
 
@@ -161,22 +185,36 @@ namespace BroadcastsSchedule
             StreamsList.Clear();
             var Request = Service.LiveStreams.List(StreamPart);
             Request.Mine = true;
-            var ReturnedResponce = Request.ExecuteAsync().Result;
-            StreamsList = ReturnedResponce.Items as List<LiveStream>;
+            try
+            {
+                var ReturnedResponce = Request.ExecuteAsync().Result;
+                StreamsList = ReturnedResponce.Items as List<LiveStream>;
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static LiveStream GetStreamByTitle(string StreamTitle, YouTubeService Service)
         {
             var Request = Service.LiveStreams.List(StreamPart);
             Request.Mine = true;
-            var ReturnedResponce = Request.ExecuteAsync().Result;
 
-            foreach (var Item in ReturnedResponce.Items)
+            try
             {
-                if (Item.Snippet.Title.ToString().ToLower().Contains(StreamTitle))
-                    return Item;
-            }
+                var ReturnedResponce = Request.ExecuteAsync().Result;
 
+                foreach (var Item in ReturnedResponce.Items)
+                {
+                    if (Item.Snippet.Title.ToString().ToLower().Contains(StreamTitle))
+                        return Item;
+                }
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return null;
         }
 
@@ -184,14 +222,21 @@ namespace BroadcastsSchedule
         {
             var Request = Service.LiveStreams.List(StreamPart);
             Request.Mine = true;
-            var ReturnedResponce = Request.ExecuteAsync().Result;
 
-            foreach (var Item in ReturnedResponce.Items)
+            try
             {
-                if (Item.Id.ToString() == (StreamID))
-                    return Item;
-            }
+                var ReturnedResponce = Request.ExecuteAsync().Result;
 
+                foreach (var Item in ReturnedResponce.Items)
+                {
+                    if (Item.Id.ToString() == (StreamID))
+                        return Item;
+                }
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return null;
         }
 
@@ -200,22 +245,36 @@ namespace BroadcastsSchedule
             BroadcastsList.Clear();
             var Request = Service.LiveBroadcasts.List(BroadcastPart);
             Request.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.All;
-            var ReturnedResponce = Request.ExecuteAsync().Result;
-            BroadcastsList = ReturnedResponce.Items as List<LiveBroadcast>;
+            try
+            {
+                var ReturnedResponce = Request.ExecuteAsync().Result;
+                BroadcastsList = ReturnedResponce.Items as List<LiveBroadcast>;
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static LiveBroadcast GetBroadcast(string BroadcastId, YouTubeService Service)
         {
             var Request = Service.LiveBroadcasts.List(BroadcastPart);
             Request.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.All;
-            var ReturnedResponce = Request.ExecuteAsync().Result;
-            
-            foreach(var Item in ReturnedResponce.Items)
-            {
-                if (Item.Id.ToString() == BroadcastId)
-                    return Item;
-            }
 
+            try
+            {
+                var ReturnedResponce = Request.ExecuteAsync().Result;
+
+                foreach (var Item in ReturnedResponce.Items)
+                {
+                    if (Item.Id.ToString() == BroadcastId)
+                        return Item;
+                }
+            }
+            catch (Google.GoogleApiException e)
+            {
+                MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return null;
         }
     }

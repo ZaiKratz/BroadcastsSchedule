@@ -16,9 +16,9 @@ namespace BroadcastsSchedule
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            BSForm = new BroadcastsSchedule();
+            BSForm = new BroadcastsScheduleClass();
             Application.Run(BSForm);
         }
-        public static BroadcastsSchedule BSForm = null;
+        public static BroadcastsScheduleClass BSForm = null;
     }
 }
