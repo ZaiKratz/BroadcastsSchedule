@@ -66,7 +66,7 @@ namespace BroadcastsSchedule
         public static List<List<object>> GetCourses(SheetsService Service)
         {
             
-            String Range = "A1:C1";
+            String Range = "A1:1";
 
             List<List<object>> Courses = new List<List<object>>();
 
@@ -124,16 +124,19 @@ namespace BroadcastsSchedule
 
             string Range = (SelItem.ToString() + 2 + ":" + SelItem.ToString());
 
-            List<List<object>> Emails = new List<List<object>>();
+            List<List<object>> Emails = null;
 
             try
             {
                 SpreadsheetsResource.ValuesResource.GetRequest Request = Service.Spreadsheets.Values.Get(EmailsSpreadsheetID, Range);
                 ValueRange RequestValues = Request.ExecuteAsync().Result;
                 var Values = RequestValues.Values;
-
-                foreach (var Item in Values)
-                    Emails.Add(Item.ToList());
+                if(Values != null)
+                {
+                    Emails = new List<List<object>>();
+                    foreach (var Item in Values)
+                        Emails.Add(Item.ToList());
+                }
             }
             catch (Google.GoogleApiException e)
             {

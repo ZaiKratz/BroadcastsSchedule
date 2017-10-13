@@ -41,7 +41,6 @@ namespace BroadcastsSchedule
                         UserName,
                         System.Threading.CancellationToken.None,
                         new Google.Apis.Util.Store.FileDataStore(credPath, true)).Result;
-
                 YouTubeService service = new YouTubeService(new YouTubeService.Initializer()
                 {
                     HttpClientInitializer = credential,

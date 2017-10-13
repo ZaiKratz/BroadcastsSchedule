@@ -38,6 +38,7 @@
             this.editLecturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editEmailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editTablesIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editAccountsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.EMails_List = new System.Windows.Forms.ListBox();
@@ -100,7 +101,8 @@
             this.editCoursesToolStripMenuItem,
             this.editLecturesToolStripMenuItem,
             this.editEmailsToolStripMenuItem,
-            this.editTablesIDToolStripMenuItem});
+            this.editTablesIDToolStripMenuItem,
+            this.editAccountsToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -108,21 +110,21 @@
             // editCoursesToolStripMenuItem
             // 
             this.editCoursesToolStripMenuItem.Name = "editCoursesToolStripMenuItem";
-            this.editCoursesToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.editCoursesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editCoursesToolStripMenuItem.Text = "Edit Courses";
             this.editCoursesToolStripMenuItem.Visible = false;
             // 
             // editLecturesToolStripMenuItem
             // 
             this.editLecturesToolStripMenuItem.Name = "editLecturesToolStripMenuItem";
-            this.editLecturesToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.editLecturesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editLecturesToolStripMenuItem.Text = "Edit Lectures";
             this.editLecturesToolStripMenuItem.Visible = false;
             // 
             // editEmailsToolStripMenuItem
             // 
             this.editEmailsToolStripMenuItem.Name = "editEmailsToolStripMenuItem";
-            this.editEmailsToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.editEmailsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editEmailsToolStripMenuItem.Text = "Edit Emails";
             this.editEmailsToolStripMenuItem.Visible = false;
             this.editEmailsToolStripMenuItem.Click += new System.EventHandler(this.editEmailsToolStripMenuItem_Click);
@@ -130,9 +132,16 @@
             // editTablesIDToolStripMenuItem
             // 
             this.editTablesIDToolStripMenuItem.Name = "editTablesIDToolStripMenuItem";
-            this.editTablesIDToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.editTablesIDToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.editTablesIDToolStripMenuItem.Text = "Edit Tables ID";
             this.editTablesIDToolStripMenuItem.Click += new System.EventHandler(this.editTablesIDToolStripMenuItem_Click);
+            // 
+            // editAccountsToolStripMenuItem
+            // 
+            this.editAccountsToolStripMenuItem.Name = "editAccountsToolStripMenuItem";
+            this.editAccountsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.editAccountsToolStripMenuItem.Text = "Edit Accounts";
+            this.editAccountsToolStripMenuItem.Click += new System.EventHandler(this.editAccountsToolStripMenuItem_Click);
             // 
             // label2
             // 
@@ -235,12 +244,6 @@
             // 
             this.Accounts_List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Accounts_List.FormattingEnabled = true;
-            this.Accounts_List.Items.AddRange(new object[] {
-            "3dmaya.com.ua@gmail.com",
-            "3dsmax.com.ua@gmail.com",
-            "zbrush3d.com@gmail.com",
-            "gameprojects.course@gmail.com",
-            "ue4.education@gmail.com"});
             this.Accounts_List.Location = new System.Drawing.Point(589, 40);
             this.Accounts_List.Name = "Accounts_List";
             this.Accounts_List.Size = new System.Drawing.Size(171, 21);
@@ -319,6 +322,7 @@
         private System.Windows.Forms.ComboBox Accounts_List;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ToolStripMenuItem editTablesIDToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editAccountsToolStripMenuItem;
     }
 }
 

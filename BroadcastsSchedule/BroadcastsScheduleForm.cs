@@ -129,16 +129,18 @@ namespace BroadcastsSchedule
                     )
                 );
 
-            
-            foreach (var Item in EMailList)
-                EMails_List.Invoke(
-                    new Action(
-                        delegate ()
-                        {
-                            EMails_List.Items.AddRange(Item.ToArray());
-                        }
-                    )
-                );
+            if(EMailList != null)
+            {
+                foreach (var Item in EMailList)
+                    EMails_List.Invoke(
+                        new Action(
+                            delegate ()
+                            {
+                                EMails_List.Items.AddRange(Item.ToArray());
+                            }
+                        )
+                    );
+            }
 
             UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
             CopyToClipboardButton.BeginInvoke((MethodInvoker)delegate () { CopyToClipboardButton.Enabled = true; });
@@ -151,6 +153,33 @@ namespace BroadcastsSchedule
         
         private void UpdateList_Click(object sender, EventArgs e)
         {
+            string[] lines = null;
+            lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
+            if (lines != null)
+            {
+                if (Accounts_List.Items.Count == 0)
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i] != string.Empty)
+                            Accounts_List.Items.Add(lines[i]);
+                    }
+                else
+                {
+                    Accounts_List.Items.Clear();
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i] != string.Empty)
+                            Accounts_List.Items.Add(lines[i]);
+                    }
+                }
+                Accounts_List.SelectedIndex = 0;
+            }
+            else
+            {
+                MessageBox.Show("No Accounts in " + System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt" + " file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             UpdateCoursesList();
             UpdateData();
         }
@@ -346,6 +375,29 @@ namespace BroadcastsSchedule
 
         private void BroadcastsScheduleClass_Load(object sender, EventArgs e)
         {
+            string[] lines = null;
+            lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
+            if (lines != null)
+                if (Accounts_List.Items.Count == 0)
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i] != string.Empty)
+                            Accounts_List.Items.Add(lines[i]);
+                    }
+                else
+                {
+                    Accounts_List.Items.Clear();
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i] != string.Empty)
+                            Accounts_List.Items.Add(lines[i]);
+                    }
+                }
+            else
+            {
+                MessageBox.Show("No Accounts in " + System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt" + " file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             SetLabelText("Select lecture and press \"Start Stream\" button");
             Accounts_List.SelectedIndex = 0;
             EndEventButton.Enabled = false;
@@ -377,6 +429,12 @@ namespace BroadcastsSchedule
         {
             EditTablesID Edit = new EditTablesID();
             Edit.ShowDialog();
+        }
+
+        private void editAccountsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Accounts Acc = new Accounts();
+            Acc.ShowDialog();
         }
     }
 
