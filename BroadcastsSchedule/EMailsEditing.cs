@@ -16,12 +16,12 @@ namespace BroadcastsSchedule
         public EMailsEditing()
         {
             InitializeComponent();
-            SheetService = Sheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
+            SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
         }
 
         private void EMailsEditing_Load(object sender, EventArgs e)
         {
-            var EMails = Sheets.GetEMails(SheetService, Program.BSForm.GetCurrentCourse());
+            var EMails = GoogleSheets.GetEMails(SheetService, Program.BSForm.GetCurrentCourse());
 
             foreach (var Item in EMails)
                 foreach (var Value in Item)
@@ -33,7 +33,21 @@ namespace BroadcastsSchedule
             List<IList<object>> EMails = new List<IList<object>>();
             string TMP = EMailsList.Text.Remove(EMailsList.Text.Length -1);
             EMails.Add(TMP.Split('\n'));
-            Sheets.EditEmailsSheet(Sheets.AuthenticateOauth(Program.BSForm.GetCurrentUser()), Program.BSForm.GetCurrentCourse(), EMails);
+            try
+            {
+                GoogleSheets.EditEmailsSheet(GoogleSheets.AuthenticateOauth(Program.BSForm.GetCurrentUser()), Program.BSForm.GetCurrentCourse(), EMails);
+            }
+            catch(Google.GoogleApiException ex)
+            {
+                MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
         }
     }
 }

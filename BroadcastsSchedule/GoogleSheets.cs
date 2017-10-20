@@ -8,7 +8,7 @@ using System.IO;
 
 namespace BroadcastsSchedule
 {
-    class Sheets
+    class GoogleSheets
     {
         private static string EmailsSpreadsheetID = "1duZ1lhwlBppThjRIAT09b5APSGkrLp35jXwFEHa0yf4";
         private static string LecturesSpreadsheetID = "1pXBy3i1FpJ0VCJng78uuDeJu4xN49sUNiTy7NulARJo";
@@ -28,18 +28,20 @@ namespace BroadcastsSchedule
         {
             string ClientID = "332318931456-l5ob314tvkjs593ae07f6ialut3c9560.apps.googleusercontent.com";
             string ClientSecret = "kVnZk-9oPd_t0J50qJG_wwmn";
-            string UserName = User;            
+            string UserName = User;
+
+            SheetsService service = null;
+
 
             string[] scopes = new string[]
             {
                 SheetsService.Scope.Spreadsheets
             };
 
+            var credPath = System.IO.Directory.GetCurrentDirectory();
+            credPath = Path.Combine(credPath, ".credentials", User, "sheets.googleapis.com-dotnet.json");
             try
             {
-                var credPath = System.IO.Directory.GetCurrentDirectory();
-                credPath = Path.Combine(credPath, ".credentials", User, "sheets.googleapis.com-dotnet.json");
-
                 UserCredential credential =
                     GoogleWebAuthorizationBroker.AuthorizeAsync(
                         new ClientSecrets { ClientId = ClientID, ClientSecret = ClientSecret },
@@ -48,19 +50,24 @@ namespace BroadcastsSchedule
                         System.Threading.CancellationToken.None,
                         new Google.Apis.Util.Store.FileDataStore(credPath, true)).Result;
 
-                SheetsService service = new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
+                service = new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "Broadcasts Schedule",
                 });
-                return service;
             }
-            catch (Exception ex)
+            catch (Google.GoogleApiException ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
+            }
+            catch (System.Net.Http.HttpRequestException ex)
             {
                 System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return null;
             }
 
+            return service;
         }
 
         public static List<List<object>> GetCourses(SheetsService Service)
@@ -68,21 +75,28 @@ namespace BroadcastsSchedule
             
             String Range = "A1:1";
 
-            List<List<object>> Courses = new List<List<object>>();
+            List<List<object>> Courses = null;
 
             try
             {
                 SpreadsheetsResource.ValuesResource.GetRequest Request = Service.Spreadsheets.Values.Get(EmailsSpreadsheetID, Range);
                 ValueRange RequestValues = Request.Execute();
                 var Values = RequestValues.Values;
-
+                Courses = new List<List<object>>();
                 foreach (var Item in Values)
                     Courses.Add(Item.ToList());
             }
-            catch (Google.GoogleApiException e)
+            catch (Google.GoogleApiException ex)
             {
-                System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
             }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
+            }
+
             return Courses;
         }
 
@@ -126,39 +140,48 @@ namespace BroadcastsSchedule
 
             List<List<object>> Emails = null;
 
+
             try
             {
                 SpreadsheetsResource.ValuesResource.GetRequest Request = Service.Spreadsheets.Values.Get(EmailsSpreadsheetID, Range);
-                ValueRange RequestValues = Request.ExecuteAsync().Result;
+                ValueRange RequestValues = Request.Execute();
                 var Values = RequestValues.Values;
-                if(Values != null)
+                if (Values != null)
                 {
                     Emails = new List<List<object>>();
                     foreach (var Item in Values)
                         Emails.Add(Item.ToList());
                 }
             }
-            catch (Google.GoogleApiException e)
+            catch (Google.GoogleApiException ex)
             {
-                System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
             }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
+            } 
+
             return Emails;
         }       
 
         public static List<List<object>> GetLectures(SheetsService Service, string Course)
         { 
             string Range = "A2:E";
-            List<List<object>> Lectures = new List<List<object>>();
+            List<List<object>> Lectures = null;
 
             try
             {
                 SpreadsheetsResource.ValuesResource.GetRequest Request = Service.Spreadsheets.Values.Get(LecturesSpreadsheetID, Range);
-                ValueRange RequestValues = Request.ExecuteAsync().Result;
+                ValueRange RequestValues = Request.Execute();
                 var Values = RequestValues.Values;
                 string LectureName;
                 string LectureDate;
                 string LectureTime;
                 string LectureDescription;
+                Lectures = new List<List<object>>(); 
                 foreach (var Item in Values)
                 {
                     if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
@@ -171,10 +194,17 @@ namespace BroadcastsSchedule
                     }
                 }
             }
-            catch (Google.GoogleApiException e)
+            catch (Google.GoogleApiException ex)
             {
-                System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
             }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return null;
+            }
+
             return Lectures;
         }
            

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -18,30 +19,30 @@ namespace BroadcastsSchedule
         public BroadcastsScheduleClass()
         {
             InitializeComponent();
-            //User = "3dmaya.com.ua@gmail.com";
-            SheetService = Sheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
-            //YouTubeService = YoutubeStream.AuthenticateOauth(User); 
+            SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
         }
 
+        
         private void UpdateData()
         {
-            Thread LecturesUpdating = new Thread(new ThreadStart(UpdateLectureListAsync));
-            LecturesUpdating.Start();
-            Thread EmailsUpdating = new Thread(new ThreadStart(UpdateEmailsListAsync));
-            EmailsUpdating.Start();
+            UpdateLectureListAsync();
+            UpdateEmailsListAsync();
         }
 
         private void UpdateCoursesList()
         {
-            var CoursesList = Sheets.GetCourses(SheetService);
+            var CoursesList = GoogleSheets.GetCourses(SheetService);
 
-            if (Courses_List.Items.Count > 0)
-                Courses_List.Items.Clear();
+            if (CoursesList != null)
+            {
+                if (Courses_List.Items.Count > 0)
+                    Courses_List.Items.Clear();
 
-            foreach (var Item in CoursesList)
-                Courses_List.Items.AddRange(Item.ToArray());
+                foreach (var Item in CoursesList)
+                    Courses_List.Items.AddRange(Item.ToArray());
 
-            Courses_List.SelectedIndex = 0;
+                Courses_List.SelectedIndex = 0;
+            }
         }
 
         private void UpdateLectureListAsync()
@@ -56,7 +57,7 @@ namespace BroadcastsSchedule
                     }
                 )
             );
-            var LecturesList = Sheets.GetLectures(SheetService, SelectedItem);
+            var LecturesList = GoogleSheets.GetLectures(SheetService, SelectedItem);
 
             var LecturesCount = 0;
             LecturesGrid.Invoke(
@@ -108,7 +109,7 @@ namespace BroadcastsSchedule
                 )
             );
 
-            var EMailList = Sheets.GetEMails(SheetService, SelIndex);
+            var EMailList = GoogleSheets.GetEMails(SheetService, SelIndex);
             var EmailsCount = 0;
             EMails_List.Invoke(
                 new Action(
@@ -148,6 +149,7 @@ namespace BroadcastsSchedule
 
         private void CoursesList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             UpdateData();
         }
         
@@ -193,13 +195,18 @@ namespace BroadcastsSchedule
         {
             Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = false; });
             UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = false; });
+
             StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = false; });
+            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.BackColor = System.Drawing.Color.LightGray; });
+
             CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = true; });
+            CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.Red; });
             SetLabelText("Creating YouTube Live Broadcast...");
 
             string Stream = "";
             string Name = "";
             string Description = "";
+            DateTime Now = DateTime.Now;
 
             if (LecturesGrid.InvokeRequired)
             {
@@ -227,33 +234,91 @@ namespace BroadcastsSchedule
                         }
                     )
                 );
+
+                DateTime Date = DateTime.Now;
+                LecturesGrid.Invoke(
+                    new Action(
+                        delegate ()
+                        {
+                            Date = DateTime.Parse(LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[1].Value.ToString());
+                        }
+                    )
+                );
+
+                DateTime Time = DateTime.Now;
+                LecturesGrid.Invoke(
+                    new Action(
+                        delegate ()
+                        {
+                            Time = DateTime.Parse(LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[2].Value.ToString());
+                        }
+                    )
+                );
+
+                Now = new DateTime(Date.Year, Date.Month, Date.Day, Time.Hour, Time.Minute, Time.Second).ToUniversalTime();
             }
 
-            //TODO: creating broadcast by date and time, described in grid
-            CurrentBroadcast = YoutubeStream.CreateLiveEvent(
-                YouTubeService,
-                Stream,
-                Name,
-                Description);
+            CurrentBroadcast = GoogleYouTube.CreateLiveEvent(
+                            YouTubeService,
+                            Stream,
+                            Name,
+                            Now,
+                            Description);
 
-            CurrentStream = YoutubeStream.GetStreamByTitle(Stream, YouTubeService);
 
-            CurrentBroadcast = YoutubeStream.StartEvent(YouTubeService, CurrentBroadcast.Id, CurrentStream.Id);
+            if(CurrentBroadcast != null)
+            {
+                CurrentStream = GoogleYouTube.GetStreamByTitle(Stream, YouTubeService);
+                if (CurrentBroadcast != null)
+                {
+                    CurrentBroadcast = GoogleYouTube.StartEvent(YouTubeService, CurrentBroadcast.Id, CurrentStream.Id);
+                    if(CurrentBroadcast != null)
+                    {
+                        EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = true; });
+                        EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.BackColor = System.Drawing.Color.Red; });
 
-            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = true; });
+                        CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
+                        CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; });
+                    }
+                }
+            }
+
+            ////MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
+            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.BackColor = System.Drawing.Color.LimeGreen; });
+
+            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
+            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; });
+
+            Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
+            UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
+
             CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
+            CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; });
+
+            SetLabelText("An error was occurred. Try again.");
+
         }
 
         private void EndLiveEventButton_Click(object sender, EventArgs e)
         {
-            SetLabelText("Ending Stream...");
-            CurrentBroadcast = YoutubeStream.EndEvent(YouTubeService, CurrentBroadcast.Id);
-            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
-            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
-            Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
-            UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
-            CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
-            SetLabelText("Stream is complete. Don't forget to stop OBS stream");
+            CurrentBroadcast = GoogleYouTube.EndEvent(YouTubeService, CurrentBroadcast.Id);
+
+            if (CurrentBroadcast != null)
+            {
+                StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
+                StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.BackColor = System.Drawing.Color.LimeGreen; });
+
+                EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
+                EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; });
+
+                Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
+                UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
+
+                CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
+                CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; });
+                SetLabelText("Stream is complete. Don't forget to stop OBS stream.");
+            }
         }
 
         private void backgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -261,7 +326,7 @@ namespace BroadcastsSchedule
             CreateLiveEventAsync();
         }
 
-        private void CancelButton_Click(object sender, EventArgs e)
+        private void CancelEventButton_Click(object sender, EventArgs e)
         {
             if (backgroundWorker.IsBusy == true)
             {
@@ -270,18 +335,30 @@ namespace BroadcastsSchedule
 
                 if (CurrentBroadcast != null)
                 {
-                    YoutubeStream.DeleteEvent(YouTubeService, CurrentBroadcast.Id);
-                    CurrentBroadcast = null;
-                    CurrentStream = null;
+                    if(GoogleYouTube.DeleteEvent(YouTubeService, CurrentBroadcast.Id))
+                    {
+                        CurrentBroadcast = null;
+                        CurrentStream = null;
+                    }
+                    
                 }
-
+            }
+            if (CurrentBroadcast == null)
+            {
                 StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
+                StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.BackColor = System.Drawing.Color.LimeGreen; });
+
                 EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
+                EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; });
+
                 Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
                 UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
+
                 CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
+                CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; });
                 SetLabelText("Canceled by user");
             }
+
         }
 
         public string GetCurrentUser()
@@ -342,12 +419,12 @@ namespace BroadcastsSchedule
                     case "ready":
                     case "teststarting":
                     case "testing":
-                        YoutubeStream.DeleteEvent(YouTubeService, CurrentBroadcast.Id);
+                        GoogleYouTube.DeleteEvent(YouTubeService, CurrentBroadcast.Id);
                         break;
                     case "live":
                     case "livestarting":
                     case "reclaimed":
-                        YoutubeStream.EndEvent(YouTubeService, CurrentBroadcast.Id);
+                        GoogleYouTube.EndEvent(YouTubeService, CurrentBroadcast.Id);
                         break;
                 }
 
@@ -401,8 +478,11 @@ namespace BroadcastsSchedule
             SetLabelText("Select lecture and press \"Start Stream\" button");
             Accounts_List.SelectedIndex = 0;
             EndEventButton.Enabled = false;
+            EndEventButton.BackColor = System.Drawing.Color.LightGray;
+
             CopyToClipboardButton.Enabled = false;
-            CancelEventButton.Enabled = false; ;
+            CancelEventButton.Enabled = false;
+            CancelEventButton.BackColor = System.Drawing.Color.LightGray;
 
             LecturesGrid.Columns.Add("LecturesColumn", "Lectures");
 
@@ -422,7 +502,20 @@ namespace BroadcastsSchedule
         private void Accounts_List_SelectedIndexChanged(object sender, EventArgs e)
         {
             User = Accounts_List.SelectedItem.ToString();
-            YouTubeService = YoutubeStream.AuthenticateOauth(User);
+            try
+            {
+                YouTubeService = GoogleYouTube.AuthenticateOauth(User);
+            }
+            catch (Google.GoogleApiException ex)
+            {
+                MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
 
         private void editTablesIDToolStripMenuItem_Click(object sender, EventArgs e)

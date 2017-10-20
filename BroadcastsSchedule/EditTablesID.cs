@@ -20,7 +20,7 @@ namespace BroadcastsSchedule
         private void EditTablesID_Load(object sender, EventArgs e)
         {
             List<string> IDs = null;
-            IDs = Sheets.GetTablesIDs();
+            IDs = GoogleSheets.GetTablesIDs();
             if (IDs != null)
             {
                 EMailsIDTextBox.Text = IDs[0].ToString();
@@ -32,7 +32,21 @@ namespace BroadcastsSchedule
         {
             if(EMailsIDTextBox.Text != string.Empty || LecturesIDTextBox.Text != string.Empty)
             {
-                Sheets.SetTablesIDs(EMailsIDTextBox.Text.ToString(), LecturesIDTextBox.Text.ToString());
+                try
+                {
+                    GoogleSheets.SetTablesIDs(EMailsIDTextBox.Text.ToString(), LecturesIDTextBox.Text.ToString());
+                    MessageBox.Show("Saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Google.GoogleApiException ex)
+                {
+                    MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                catch (System.Net.Http.HttpRequestException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
         }
 
