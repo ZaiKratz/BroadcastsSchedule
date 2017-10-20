@@ -283,21 +283,6 @@ namespace BroadcastsSchedule
                 }
             }
 
-            ////MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.Enabled = true; });
-            StartStreamButton.BeginInvoke((MethodInvoker)delegate () { StartStreamButton.BackColor = System.Drawing.Color.LimeGreen; });
-
-            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.Enabled = false; });
-            EndEventButton.BeginInvoke((MethodInvoker)delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; });
-
-            Courses_List.BeginInvoke((MethodInvoker)delegate () { Courses_List.Enabled = true; });
-            UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = true; });
-
-            CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.Enabled = false; });
-            CancelEventButton.BeginInvoke((MethodInvoker)delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; });
-
-            SetLabelText("An error was occurred. Try again.");
-
         }
 
         private void EndLiveEventButton_Click(object sender, EventArgs e)

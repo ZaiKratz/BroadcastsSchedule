@@ -257,7 +257,7 @@ namespace BroadcastsSchedule
 
                 foreach (var Item in ReturnedResponce.Items)
                 {
-                    if (Item.Snippet.Title.ToString().ToLower().Contains(StreamTitle))
+                    if (Item.Snippet.Title.ToString().ToLower().Contains(StreamTitle.ToLower()))
                         return Item;
                 }
             }
