@@ -181,18 +181,20 @@ namespace BroadcastsSchedule
                 string LectureDate;
                 string LectureTime;
                 string LectureDescription;
-                Lectures = new List<List<object>>(); 
-                foreach (var Item in Values)
-                {
-                    if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
+                Lectures = new List<List<object>>();
+
+                if (Values != null)
+                    foreach (var Item in Values)
                     {
-                        LectureName = Item[1].ToString();
-                        LectureDate = Item[2].ToString();
-                        LectureTime = Item[3].ToString();
-                        LectureDescription = Item[4].ToString();
-                        Lectures.Add(new List<object> { LectureName, LectureDate, LectureTime, LectureDescription });
+                        if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
+                        {
+                            LectureName = Item[1].ToString();
+                            LectureDate = Item[2].ToString();
+                            LectureTime = Item[3].ToString();
+                            LectureDescription = Item[4].ToString();
+                            Lectures.Add(new List<object> { LectureName, LectureDate, LectureTime, LectureDescription });
+                        }
                     }
-                }
             }
             catch (Google.GoogleApiException ex)
             {

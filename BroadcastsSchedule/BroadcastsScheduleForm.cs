@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
@@ -31,7 +32,9 @@ namespace BroadcastsSchedule
 
         private void UpdateCoursesList()
         {
-            var CoursesList = GoogleSheets.GetCourses(SheetService);
+            List<List<object>> CoursesList = null;
+            if (SheetService != null)
+                CoursesList = GoogleSheets.GetCourses(SheetService);
 
             if (CoursesList != null)
             {
