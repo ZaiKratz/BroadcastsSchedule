@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BroadcastsScheduleClass));
             this.UpdateList = new System.Windows.Forms.Button();
             this.Courses_List = new System.Windows.Forms.ComboBox();
@@ -51,6 +52,7 @@
             this.Accounts_List = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.backgroundWorker = new BroadcastsSchedule.AbortableBackgroundWorker();
+            this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).BeginInit();
             this.SuspendLayout();
@@ -272,6 +274,12 @@
             // 
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             // 
+            // NotifyIcon
+            // 
+            this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
+            this.NotifyIcon.Text = "Broadcasts Schedule";
+            this.NotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseDoubleClick);
+            // 
             // BroadcastsScheduleClass
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -301,6 +309,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BroadcastsScheduleClass_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BroadcastsScheduleClass_FormClosed);
             this.Load += new System.EventHandler(this.BroadcastsScheduleClass_Load);
+            this.Resize += new System.EventHandler(this.BroadcastsScheduleClass_Resize);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).EndInit();
@@ -333,6 +342,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ToolStripMenuItem editTablesIDToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editAccountsToolStripMenuItem;
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
     }
 }
 

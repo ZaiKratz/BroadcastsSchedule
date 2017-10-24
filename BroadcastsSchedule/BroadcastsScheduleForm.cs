@@ -16,13 +16,31 @@ namespace BroadcastsSchedule
         private Google.Apis.YouTube.v3.YouTubeService YouTubeService = null;
         private Google.Apis.Sheets.v4.SheetsService SheetService = null;
         private string User = null;
+        private static object Locker = new object();
 
         public BroadcastsScheduleClass()
         {
             InitializeComponent();
-            SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
+
+            Thread AuthServisesThread = new Thread(Authenticate);
+            AuthServisesThread.Start();
+
+            //SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
         }
 
+        private void Authenticate()
+        {
+            lock (Locker)
+            {
+                SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
+                YouTubeService = GoogleYouTube.AuthenticateOauth(User);
+                if(SheetService != null && YouTubeService != null)
+                {
+                    UpdateCoursesList();
+                    UpdateData();   
+                }
+            }
+        }
         
         private void UpdateData()
         {
@@ -39,12 +57,34 @@ namespace BroadcastsSchedule
             if (CoursesList != null)
             {
                 if (Courses_List.Items.Count > 0)
-                    Courses_List.Items.Clear();
+                    Courses_List.Invoke(
+                                    new Action(
+                                        delegate ()
+                                        {
+                                            Courses_List.Items.Clear();
+                                        }
+                                    )
+                                );
 
                 foreach (var Item in CoursesList)
-                    Courses_List.Items.AddRange(Item.ToArray());
+                    Courses_List.Invoke(
+                                new Action(
+                                    delegate ()
+                                    {
+                                        Courses_List.Items.AddRange(Item.ToArray());
+                                    }
+                                )
+                            );
 
-                Courses_List.SelectedIndex = 0;
+                Courses_List.Invoke(
+                            new Action(
+                                delegate ()
+                                {
+                                    Courses_List.SelectedIndex = 0;
+                                }
+                            )
+                        );
+                
             }
         }
 
@@ -52,52 +92,57 @@ namespace BroadcastsSchedule
         {
             UpdateList.BeginInvoke((MethodInvoker)delegate () { UpdateList.Enabled = false; });
             var SelectedItem = "";
-            Courses_List.Invoke(
-                new Action(
-                    delegate ()
-                    {
-                        SelectedItem = Courses_List.SelectedItem.ToString();
-                    }
-                )
-            );
-            var LecturesList = GoogleSheets.GetLectures(SheetService, SelectedItem);
 
-            var LecturesCount = 0;
-            LecturesGrid.Invoke(
-                new Action(
-                    delegate ()
-                    {
-                        LecturesCount = LecturesGrid.Rows.Count;
-                    }
-                )
-            );
-            if (LecturesCount > 0)
+            if(Courses_List.Items.Count != 0)
+            {
+                Courses_List.Invoke(
+                                new Action(
+                                    delegate ()
+                                    {
+                                        SelectedItem = Courses_List.SelectedItem.ToString();
+                                    }
+                                )
+                            );
+                var LecturesList = GoogleSheets.GetLectures(SheetService, SelectedItem);
+
+                var LecturesCount = 0;
                 LecturesGrid.Invoke(
                     new Action(
                         delegate ()
                         {
-                            LecturesGrid.Rows.Clear();
+                            LecturesCount = LecturesGrid.Rows.Count;
                         }
                     )
-            );
+                );
+                if (LecturesCount > 0)
+                    LecturesGrid.Invoke(
+                        new Action(
+                            delegate ()
+                            {
+                                LecturesGrid.Rows.Clear();
+                            }
+                        )
+                );
 
-            foreach (var Item in LecturesList)
-            {
-                var date = DateTime.ParseExact(Item[1].ToString(), "dd.MM", null);
-                var time = DateTime.Parse(Item[2].ToString(), System.Globalization.CultureInfo.InvariantCulture);
-                LecturesGrid.Invoke(
-                                new Action(
-                                    delegate ()
-                                    {
-                                        LecturesGrid.Rows.Add(
-                                            Item[0].ToString(), 
-                                            date,
-                                            time, 
-                                            Item[3].ToString());
-                                    }
-                                )
-                            );
+                foreach (var Item in LecturesList)
+                {
+                    var date = DateTime.ParseExact(Item.ElementAtOrDefault(1).ToString(), "dd.MM", null);
+                    var time = DateTime.Parse(Item.ElementAtOrDefault(2).ToString(), System.Globalization.CultureInfo.InvariantCulture);
+                    LecturesGrid.Invoke(
+                                    new Action(
+                                        delegate ()
+                                        {
+                                            LecturesGrid.Rows.Add(
+                                                Item.ElementAtOrDefault(0).ToString(),
+                                                date,
+                                                time,
+                                                Item.ElementAtOrDefault(3).ToString());
+                                        }
+                                    )
+                                );
+                }
             }
+
         }
 
         private void UpdateEmailsListAsync()
@@ -490,20 +535,20 @@ namespace BroadcastsSchedule
         private void Accounts_List_SelectedIndexChanged(object sender, EventArgs e)
         {
             User = Accounts_List.SelectedItem.ToString();
-            try
-            {
-                YouTubeService = GoogleYouTube.AuthenticateOauth(User);
-            }
-            catch (Google.GoogleApiException ex)
-            {
-                MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            catch (System.Net.Http.HttpRequestException ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            //try
+            //{
+            //    YouTubeService = GoogleYouTube.AuthenticateOauth(User);
+            //}
+            //catch (Google.GoogleApiException ex)
+            //{
+            //    MessageBox.Show(ex.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
+            //catch (System.Net.Http.HttpRequestException ex)
+            //{
+            //    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
         }
 
         private void editTablesIDToolStripMenuItem_Click(object sender, EventArgs e)
@@ -516,6 +561,22 @@ namespace BroadcastsSchedule
         {
             Accounts Acc = new Accounts();
             Acc.ShowDialog();
+        }
+
+        private void BroadcastsScheduleClass_Resize(object sender, EventArgs e)
+        {
+            if(WindowState == FormWindowState.Minimized)
+            {
+                ShowInTaskbar = false;
+                NotifyIcon.Visible = true;
+            }
+        }
+
+        private void NotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            NotifyIcon.Visible = false;
+            ShowInTaskbar = true;
+            WindowState = FormWindowState.Normal;
         }
     }
 

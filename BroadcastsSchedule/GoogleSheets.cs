@@ -177,10 +177,10 @@ namespace BroadcastsSchedule
                 SpreadsheetsResource.ValuesResource.GetRequest Request = Service.Spreadsheets.Values.Get(LecturesSpreadsheetID, Range);
                 ValueRange RequestValues = Request.Execute();
                 var Values = RequestValues.Values;
-                string LectureName;
-                string LectureDate;
-                string LectureTime;
-                string LectureDescription;
+                string LectureName = "";
+                string LectureDate = "";
+                string LectureTime = "";
+                string LectureDescription = "";
                 Lectures = new List<List<object>>();
 
                 if (Values != null)
@@ -188,12 +188,13 @@ namespace BroadcastsSchedule
                     {
                         if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
                         {
-                            LectureName = Item[1].ToString();
-                            LectureDate = Item[2].ToString();
-                            LectureTime = Item[3].ToString();
-                            LectureDescription = Item[4].ToString();
+                            LectureName = Item.ElementAtOrDefault(1) != null ? Item.ElementAtOrDefault(1).ToString() : "";
+                            LectureDate = Item.ElementAtOrDefault(2) != null ? Item.ElementAtOrDefault(2).ToString() : "";
+                            LectureTime = Item.ElementAtOrDefault(3) != null ? Item.ElementAtOrDefault(3).ToString() : "";
+                            LectureDescription = Item.ElementAtOrDefault(4) != null ? Item.ElementAtOrDefault(4).ToString() : "";
                             Lectures.Add(new List<object> { LectureName, LectureDate, LectureTime, LectureDescription });
                         }
+                        
                     }
             }
             catch (Google.GoogleApiException ex)
