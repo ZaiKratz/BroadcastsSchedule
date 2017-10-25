@@ -39,7 +39,7 @@ namespace BroadcastsSchedule
 
             UpdateAccountsList();
 
-            SetLabelText("Select lecture and press \"Start Stream\" button");
+            SetStatus("Select lecture and press \"Start Stream\" button");
             if(Accounts_List.Items.Count > 0)
                 Accounts_List.SelectedIndex = 0;
             EndEventButton.Enabled = false;
@@ -139,7 +139,7 @@ namespace BroadcastsSchedule
                 {
                     backgroundWorker.Abort();
                     backgroundWorker.Dispose();
-                    SetLabelText("Canceled by user");
+                    SetStatus("Canceled by user");
                 }
 
                 var LiveCycleStatus = CurrentBroadcast.Status.LifeCycleStatus.ToLower();
@@ -490,15 +490,16 @@ namespace BroadcastsSchedule
         {
             Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = false; }));
             UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
+            Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = false; }));
 
             StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
             StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
 
             CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = true; }));
             CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.Red; }));
-            SetLabelText("Creating YouTube Live Broadcast...");
+            SetStatus("Creating YouTube Live Broadcast...");
 
-            string Stream = "";
+            string StreamTitle = "";
             string Name = "";
             string Description = "";
             DateTime ScheduledDateTime = DateTime.Now;
@@ -508,7 +509,7 @@ namespace BroadcastsSchedule
                 new Action(
                     delegate ()
                     {
-                        Stream = Courses_List.SelectedItem.ToString();
+                        StreamTitle = Courses_List.SelectedItem.ToString();
                     }
                 )
             );
@@ -556,16 +557,17 @@ namespace BroadcastsSchedule
             ScheduledDateTime = new DateTime(Date.Year, Date.Month, Date.Day, Time.Hour, Time.Minute, Time.Second).ToUniversalTime();
 
 
-            CurrentBroadcast = GoogleYouTube.CreateLiveEvent(
-                            Stream,
-                            Name,
-                            ScheduledDateTime,
-                            Description);
+            GoogleYouTube.CreateLiveEvent(
+                ref CurrentBroadcast,
+                    StreamTitle,
+                    Name,
+                    ScheduledDateTime,
+                    Description);
 
             if (CurrentBroadcast != null)
             {
                 BroadcastSettingsLink.Invoke(new Action(delegate () { BroadcastSettingsLink.Enabled = true; }));
-                CurrentStream = GoogleYouTube.GetStreamByTitle(Stream);
+                CurrentStream = GoogleYouTube.GetStreamByTitle(StreamTitle);
                 if (CurrentBroadcast != null)
                 {
                     CurrentBroadcast = GoogleYouTube.StartEvent(CurrentBroadcast.Id, CurrentStream.Id);
@@ -597,10 +599,11 @@ namespace BroadcastsSchedule
 
                 Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
+                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
 
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = false; }));
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; }));
-                SetLabelText("Stream is complete. Don't forget to stop OBS stream.");
+                SetStatus("Stream is complete. Don't forget to stop OBS stream.");
             }
         }
 
@@ -613,12 +616,12 @@ namespace BroadcastsSchedule
 
                 if (CurrentBroadcast != null)
                 {
-                    if (GoogleYouTube.DeleteEvent(CurrentBroadcast.Id))
-                    {
-                        CurrentBroadcast = null;
-                        CurrentStream = null;
-                    }
-
+                    if(CurrentBroadcast.Id != null)
+                        if (GoogleYouTube.DeleteEvent(CurrentBroadcast.Id))
+                        {
+                            CurrentBroadcast = null;
+                            CurrentStream = null;
+                        }
                 }
             }
             if (CurrentBroadcast == null)
@@ -632,10 +635,11 @@ namespace BroadcastsSchedule
 
                 Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
+                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
 
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = false; }));
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; }));
-                SetLabelText("Canceled by user");
+                SetStatus("Canceled by user");
             }
         }
 
@@ -699,9 +703,9 @@ namespace BroadcastsSchedule
             return SelIndex;
         }
 
-        public void SetLabelText(string Text)
+        public void SetStatus(string Text)
         {
-            label4.Invoke(new Action(delegate () { label4.Text = Text; }));
+            CurrentStatusLabel.Text = Text;
         }
 
         

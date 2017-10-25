@@ -45,18 +45,20 @@
             this.EMails_List = new System.Windows.Forms.ListBox();
             this.LecturesGrid = new System.Windows.Forms.DataGridView();
             this.StartEventButton = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
             this.EndEventButton = new System.Windows.Forms.Button();
             this.CancelEventButton = new System.Windows.Forms.Button();
             this.CopyToClipboardButton = new System.Windows.Forms.Button();
             this.Accounts_List = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.backgroundWorker = new BroadcastsSchedule.AbortableBackgroundWorker();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.BroadcastSettingsLink = new System.Windows.Forms.LinkLabel();
             this.CancelAuth = new System.Windows.Forms.Button();
+            this.CurrentStatus = new System.Windows.Forms.StatusStrip();
+            this.CurrentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.backgroundWorker = new BroadcastsSchedule.AbortableBackgroundWorker();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).BeginInit();
+            this.CurrentStatus.SuspendLayout();
             this.SuspendLayout();
             // 
             // UpdateButton
@@ -96,7 +98,7 @@
             this.editToolStripMenuItem});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(804, 24);
+            this.menuStrip.Size = new System.Drawing.Size(864, 24);
             this.menuStrip.TabIndex = 3;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -161,7 +163,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(529, 84);
+            this.label3.Location = new System.Drawing.Point(538, 84);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(84, 13);
             this.label3.TabIndex = 6;
@@ -171,9 +173,9 @@
             // 
             this.EMails_List.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.EMails_List.FormattingEnabled = true;
-            this.EMails_List.Location = new System.Drawing.Point(528, 100);
+            this.EMails_List.Location = new System.Drawing.Point(537, 100);
             this.EMails_List.Name = "EMails_List";
-            this.EMails_List.Size = new System.Drawing.Size(264, 134);
+            this.EMails_List.Size = new System.Drawing.Size(315, 134);
             this.EMails_List.TabIndex = 7;
             // 
             // LecturesGrid
@@ -188,7 +190,7 @@
             this.LecturesGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.LecturesGrid.Location = new System.Drawing.Point(12, 100);
             this.LecturesGrid.Name = "LecturesGrid";
-            this.LecturesGrid.Size = new System.Drawing.Size(510, 302);
+            this.LecturesGrid.Size = new System.Drawing.Size(516, 304);
             this.LecturesGrid.TabIndex = 8;
             // 
             // StartEventButton
@@ -197,7 +199,7 @@
             this.StartEventButton.BackColor = System.Drawing.Color.LimeGreen;
             this.StartEventButton.FlatAppearance.BorderSize = 0;
             this.StartEventButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.StartEventButton.Location = new System.Drawing.Point(528, 325);
+            this.StartEventButton.Location = new System.Drawing.Point(537, 340);
             this.StartEventButton.Name = "StartEventButton";
             this.StartEventButton.Size = new System.Drawing.Size(90, 28);
             this.StartEventButton.TabIndex = 10;
@@ -205,22 +207,12 @@
             this.StartEventButton.UseVisualStyleBackColor = true;
             this.StartEventButton.Click += new System.EventHandler(this.StartLiveEvent_Click);
             // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(525, 356);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 11;
-            this.label4.Text = "label4";
-            // 
             // EndEventButton
             // 
             this.EndEventButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EndEventButton.FlatAppearance.BorderSize = 0;
             this.EndEventButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.EndEventButton.Location = new System.Drawing.Point(528, 374);
+            this.EndEventButton.Location = new System.Drawing.Point(537, 376);
             this.EndEventButton.Name = "EndEventButton";
             this.EndEventButton.Size = new System.Drawing.Size(90, 28);
             this.EndEventButton.TabIndex = 12;
@@ -233,7 +225,7 @@
             this.CancelEventButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelEventButton.FlatAppearance.BorderSize = 0;
             this.CancelEventButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.CancelEventButton.Location = new System.Drawing.Point(624, 325);
+            this.CancelEventButton.Location = new System.Drawing.Point(633, 340);
             this.CancelEventButton.Name = "CancelEventButton";
             this.CancelEventButton.Size = new System.Drawing.Size(75, 28);
             this.CancelEventButton.TabIndex = 13;
@@ -244,7 +236,7 @@
             // CopyToClipboardButton
             // 
             this.CopyToClipboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CopyToClipboardButton.Location = new System.Drawing.Point(532, 240);
+            this.CopyToClipboardButton.Location = new System.Drawing.Point(537, 237);
             this.CopyToClipboardButton.Name = "CopyToClipboardButton";
             this.CopyToClipboardButton.Size = new System.Drawing.Size(97, 23);
             this.CopyToClipboardButton.TabIndex = 14;
@@ -257,7 +249,7 @@
             this.Accounts_List.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Accounts_List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Accounts_List.FormattingEnabled = true;
-            this.Accounts_List.Location = new System.Drawing.Point(621, 40);
+            this.Accounts_List.Location = new System.Drawing.Point(681, 40);
             this.Accounts_List.Name = "Accounts_List";
             this.Accounts_List.Size = new System.Drawing.Size(171, 21);
             this.Accounts_List.TabIndex = 15;
@@ -267,15 +259,11 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(618, 25);
+            this.label5.Location = new System.Drawing.Point(678, 25);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(95, 13);
             this.label5.TabIndex = 16;
             this.label5.Text = "Youtube Accounts";
-            // 
-            // backgroundWorker
-            // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             // 
             // NotifyIcon
             // 
@@ -285,9 +273,10 @@
             // 
             // BroadcastSettingsLink
             // 
+            this.BroadcastSettingsLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BroadcastSettingsLink.AutoSize = true;
             this.BroadcastSettingsLink.Enabled = false;
-            this.BroadcastSettingsLink.Location = new System.Drawing.Point(696, 237);
+            this.BroadcastSettingsLink.Location = new System.Drawing.Point(756, 237);
             this.BroadcastSettingsLink.Name = "BroadcastSettingsLink";
             this.BroadcastSettingsLink.Size = new System.Drawing.Size(96, 13);
             this.BroadcastSettingsLink.TabIndex = 17;
@@ -298,8 +287,9 @@
             // 
             // CancelAuth
             // 
+            this.CancelAuth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.CancelAuth.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.CancelAuth.Location = new System.Drawing.Point(744, 64);
+            this.CancelAuth.Location = new System.Drawing.Point(804, 64);
             this.CancelAuth.Margin = new System.Windows.Forms.Padding(0);
             this.CancelAuth.Name = "CancelAuth";
             this.CancelAuth.Size = new System.Drawing.Size(48, 20);
@@ -309,11 +299,31 @@
             this.CancelAuth.Visible = false;
             this.CancelAuth.Click += new System.EventHandler(this.CancelAuth_Click);
             // 
+            // CurrentStatus
+            // 
+            this.CurrentStatus.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.CurrentStatusLabel});
+            this.CurrentStatus.Location = new System.Drawing.Point(0, 407);
+            this.CurrentStatus.Name = "CurrentStatus";
+            this.CurrentStatus.Size = new System.Drawing.Size(864, 22);
+            this.CurrentStatus.TabIndex = 19;
+            this.CurrentStatus.Text = "statusStrip1";
+            // 
+            // CurrentStatusLabel
+            // 
+            this.CurrentStatusLabel.Name = "CurrentStatusLabel";
+            this.CurrentStatusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
+            // 
             // BroadcastsScheduleClass
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(804, 406);
+            this.ClientSize = new System.Drawing.Size(864, 429);
+            this.Controls.Add(this.CurrentStatus);
             this.Controls.Add(this.CancelAuth);
             this.Controls.Add(this.BroadcastSettingsLink);
             this.Controls.Add(this.label5);
@@ -321,7 +331,6 @@
             this.Controls.Add(this.CopyToClipboardButton);
             this.Controls.Add(this.CancelEventButton);
             this.Controls.Add(this.EndEventButton);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.StartEventButton);
             this.Controls.Add(this.LecturesGrid);
             this.Controls.Add(this.EMails_List);
@@ -333,7 +342,7 @@
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(820, 445);
+            this.MinimumSize = new System.Drawing.Size(880, 445);
             this.Name = "BroadcastsScheduleClass";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Broadcasts Schedule";
@@ -344,6 +353,8 @@
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).EndInit();
+            this.CurrentStatus.ResumeLayout(false);
+            this.CurrentStatus.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -362,7 +373,6 @@
         private System.Windows.Forms.DataGridView LecturesGrid;
         private AbortableBackgroundWorker backgroundWorker;
         private System.Windows.Forms.Button StartEventButton;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button EndEventButton;
         private System.Windows.Forms.Button CancelEventButton;
         private System.Windows.Forms.ToolStripMenuItem editCoursesToolStripMenuItem;
@@ -376,6 +386,8 @@
         private System.Windows.Forms.NotifyIcon NotifyIcon;
         private System.Windows.Forms.LinkLabel BroadcastSettingsLink;
         private System.Windows.Forms.Button CancelAuth;
+        private System.Windows.Forms.StatusStrip CurrentStatus;
+        private System.Windows.Forms.ToolStripStatusLabel CurrentStatusLabel;
     }
 }
 

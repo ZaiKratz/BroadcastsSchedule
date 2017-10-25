@@ -55,12 +55,12 @@ namespace BroadcastsSchedule
             LiveBroadcast Broadcast = null;
             if (Service != null)
             {
-                Program.BSForm.SetLabelText("Checking for OBS connection...");
+                Program.BSForm.SetStatus("Checking for OBS connection...");
                 while (GetStreamByID(StreamId).Status.StreamStatus != "active")
                 {
-                    Program.BSForm.SetLabelText("Waiting for OBS connection...");
+                    Program.BSForm.SetStatus("Waiting for OBS connection...");
                 }
-                Program.BSForm.SetLabelText("OBS connected");
+                Program.BSForm.SetStatus("OBS connected");
 
 
                 try
@@ -71,10 +71,9 @@ namespace BroadcastsSchedule
                     Broadcast = Testeq.Execute();
 
 
-
                     while (GetBroadcast(BroadcastId).Status.LifeCycleStatus != "testing")
                     {
-                        Program.BSForm.SetLabelText("Testing connection...");
+                        Program.BSForm.SetStatus("Testing connection...");
                     }
 
                     LiveBroadcastsResource.TransitionRequest LiveReq =
@@ -82,16 +81,18 @@ namespace BroadcastsSchedule
                         BroadcastId, BroadcastPart);
                     Broadcast = LiveReq.Execute();
 
-                    Program.BSForm.SetLabelText("Now You are Live!");
+                    Program.BSForm.SetStatus("Now You are Live!");
                 }
                 catch (Google.GoogleApiException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while starting broadcast. Cancel it and try again.");
                     return null;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while starting broadcast. Cancel it and try again.");
                     return null;
                 }     
             }
@@ -101,7 +102,7 @@ namespace BroadcastsSchedule
 
         public static LiveBroadcast EndEvent(string BroadcastId)
         {
-            Program.BSForm.SetLabelText("Ending Stream...");
+            Program.BSForm.SetStatus("Ending Stream...");
             LiveBroadcast Broadcast = null;
 
             if(Service != null)
@@ -116,11 +117,13 @@ namespace BroadcastsSchedule
                 catch (Google.GoogleApiException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while ending broadcast.");
                     return null;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while ending broadcast.");
                     return null;
                 }
             }
@@ -141,99 +144,110 @@ namespace BroadcastsSchedule
                 catch (Google.GoogleApiException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while deleting broadcast.");
                     return false;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast.");
                     return false;
                 }
             }
             return false;
         }
 
-        public static LiveBroadcast CreateLiveEvent(string CourseName, string Name, DateTime Date, string Description)
+        public static void CreateLiveEvent(ref LiveBroadcast Broadcast, string CourseName, string Name, DateTime Date, string Description)
         {
-            LiveBroadcast Broadcast = null;
             if(Service != null)
             {
                 var Stream = GetStreamByTitle(CourseName);
-
-                Broadcast = new LiveBroadcast();
-
-                Broadcast.Snippet = new LiveBroadcastSnippet();
-                Broadcast.Snippet.Title = Name;
-                Broadcast.Snippet.Description = Description;
-                Broadcast.Snippet.ScheduledStartTime = Date.ToUniversalTime();
-
-
-                Broadcast.Status = new LiveBroadcastStatus();
-                Broadcast.Status.PrivacyStatus = "private";
-
-                Broadcast.ContentDetails = new LiveBroadcastContentDetails();
-                Broadcast.ContentDetails.RecordFromStart = true;
-                Broadcast.ContentDetails.EnableDvr = true;
-
-                Broadcast.Kind = "youtube#liveBroadcast";
-
-                try
+                if(Stream != null)
                 {
+                    Broadcast = new LiveBroadcast();
 
-                    LiveBroadcastsResource.InsertRequest InsertRequest = Service.LiveBroadcasts.Insert(Broadcast, BroadcastPart);
-                    Broadcast = InsertRequest.Execute();
+                    Broadcast.Snippet = new LiveBroadcastSnippet();
+                    Broadcast.Snippet.Title = Name;
+                    Broadcast.Snippet.Description = Description;
+                    Broadcast.Snippet.ScheduledStartTime = Date.ToUniversalTime();
 
-                    if (Stream != null)
+
+                    Broadcast.Status = new LiveBroadcastStatus();
+                    Broadcast.Status.PrivacyStatus = "private";
+
+                    Broadcast.ContentDetails = new LiveBroadcastContentDetails();
+                    Broadcast.ContentDetails.RecordFromStart = true;
+                    Broadcast.ContentDetails.EnableDvr = true;
+
+                    Broadcast.Kind = "youtube#liveBroadcast";
+
+                    try
                     {
-                        LiveBroadcastsResource.BindRequest BindRequest = Service.LiveBroadcasts.Bind(Broadcast.Id, BroadcastPart);
-                        BindRequest.StreamId = Stream.Id;
-                        Broadcast = BindRequest.Execute();
+                        LiveBroadcastsResource.InsertRequest InsertRequest = Service.LiveBroadcasts.Insert(Broadcast, BroadcastPart);
+                        Broadcast = InsertRequest.Execute();
+
+                        if (Stream != null)
+                        {
+                            LiveBroadcastsResource.BindRequest BindRequest = Service.LiveBroadcasts.Bind(Broadcast.Id, BroadcastPart);
+                            BindRequest.StreamId = Stream.Id;
+                            Broadcast = BindRequest.Execute();
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Stream for " + CourseName + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                            Broadcast = null;
+                            return;
+                        }
+
+                        var ListRequest = Service.Videos.List(BroadcastPart);
+                        ListRequest.Id = Broadcast.Id;
+
+                        var ListResponce = ListRequest.Execute();
+
+                        foreach (var BroadcastVideo in ListResponce.Items)
+                        {
+                            BroadcastVideo.Snippet.CategoryId = "27";
+                            var UpdateRequest = Service.Videos.Update(BroadcastVideo, BroadcastPart);
+                            UpdateRequest.Execute();
+                        }
+
+                        Program.BSForm.SetStatus("Preparing to download image form drive...");
+                        System.IO.MemoryStream Image = GoogleDrive.GetImage(GoogleDrive.AuthenticateOauth(), Stream.Snippet.Title);
+
+                        if (Image != null)
+                        {
+                            Program.BSForm.SetStatus("Setting up downloaded image...");
+                            var InputStream = new System.IO.BufferedStream(Image);
+                            var req = Service.Thumbnails.Set(Broadcast.Id, InputStream, "image/jpeg");
+                            req.Upload();
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Image \"" + Stream.Snippet.Title + ".jpg\" not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        }
                     }
-                    else
+                    catch (Google.GoogleApiException ex)
                     {
-                        System.Windows.Forms.MessageBox.Show("Stream for " + CourseName + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                        return null;
+                        System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                        Broadcast = null;
+                        return;
                     }
-
-                    var ListRequest = Service.Videos.List(BroadcastPart);
-                    ListRequest.Id = Broadcast.Id;
-
-                    var ListResponce = ListRequest.Execute();
-
-                    foreach (var BroadcastVideo in ListResponce.Items)
+                    catch (System.Net.Http.HttpRequestException ex)
                     {
-                        BroadcastVideo.Snippet.CategoryId = "27";
-                        var UpdateRequest = Service.Videos.Update(BroadcastVideo, BroadcastPart);
-                        UpdateRequest.Execute();
+                        System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                        Broadcast = null;
+                        return;
                     }
-
-                    Program.BSForm.SetLabelText("Preparing to download image form drive...");
-                    System.IO.MemoryStream Image = GoogleDrive.GetImage(GoogleDrive.AuthenticateOauth(), Stream.Snippet.Title);
-
-                    if (Image != null)
-                    {
-                        Program.BSForm.SetLabelText("Setting up downloaded image...");
-                        var InputStream = new System.IO.BufferedStream(Image);
-                        var req = Service.Thumbnails.Set(Broadcast.Id, InputStream, "image/jpeg");
-                        req.Upload();
-                    }
-                    else
-                    {
-                        System.Windows.Forms.MessageBox.Show("Image \"" + Stream.Snippet.Title + ".jpg\" not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    }
-                }
-                catch (Google.GoogleApiException ex)
-                {
-                    System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return null;
-                }
-                catch (System.Net.Http.HttpRequestException ex)
-                {
-                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return null;
                 }
             }
-
-            return Broadcast;
+            else
+            {
+                Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                Broadcast = null;
+            }
         }
 
         public static void GetStreams(ref List<LiveStream> StreamsList)
@@ -279,11 +293,13 @@ namespace BroadcastsSchedule
                 catch (Google.GoogleApiException e)
                 {
                     System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                     return null;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                     return null;
                 }
             }
@@ -310,40 +326,17 @@ namespace BroadcastsSchedule
                 catch (Google.GoogleApiException e)
                 {
                     System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                     return null;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                     return null;
                 }
             }
             return null;
-        }
-
-        public static void GetBroadcasts(ref List<LiveBroadcast> BroadcastsList)
-        {
-            if(Service != null)
-            {
-                BroadcastsList.Clear();
-                var Request = Service.LiveBroadcasts.List(BroadcastPart);
-                Request.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.All;
-                try
-                {
-                    var ReturnedResponce = Request.Execute();
-                    BroadcastsList = ReturnedResponce.Items as List<LiveBroadcast>;
-                }
-                catch (Google.GoogleApiException e)
-                {
-                    System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return;
-                }
-                catch (System.Net.Http.HttpRequestException ex)
-                {
-                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return;
-                }
-            }
         }
 
         public static LiveBroadcast GetBroadcast(string BroadcastId)
