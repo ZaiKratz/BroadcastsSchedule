@@ -15,7 +15,18 @@ namespace BroadcastsSchedule
     {
         static string[] Scopes = { DriveService.Scope.DriveReadonly };
         static string ApplicationName = "Broadcasts Schedule";
-        static string YouTubePicturesFolderID = "0B4PpJ-s2evO5NUE4VktUVUVVOU0";
+        private static string _YouTubePicturesFolderID = "0B4PpJ-s2evO5NUE4VktUVUVVOU0";
+        public static string YouTubePicturesFolderID
+        {
+            get
+            {
+                return _YouTubePicturesFolderID;
+            }
+            set
+            {
+                _YouTubePicturesFolderID = value;
+            }
+        }
 
         public static DriveService AuthenticateOauth()
         {
@@ -56,55 +67,59 @@ namespace BroadcastsSchedule
             string PageToken = null;
             File Image = null;
             System.IO.MemoryStream Stream = null;
-            try
+            if (Service != null)
             {
-                do
+                try
                 {
-                    var ListRequest = Service.Files.List();
-                    ListRequest.Q = "mimeType='image/jpeg'";
-                    ListRequest.Spaces = "drive";
-                    ListRequest.PageToken = PageToken;
-                    var Result = ListRequest.Execute();
-
-                    foreach (var file in Result.Items)
+                    do
                     {
-                        foreach (var parent in file.Parents)
+                        var ListRequest = Service.Files.List();
+                        ListRequest.Q = "mimeType='image/jpeg'";
+                        ListRequest.Spaces = "drive";
+                        ListRequest.PageToken = PageToken;
+                        var Result = ListRequest.Execute();
+
+                        foreach (var file in Result.Items)
                         {
-                            if (parent.Id == YouTubePicturesFolderID)
+                            foreach (var parent in file.Parents)
                             {
-                                if (file.Title.ToLower().Contains(Course.ToLower()))
+                                if (parent.Id == YouTubePicturesFolderID)
                                 {
-                                    Image = file;
-                                    break;
+                                    if (file.Title.ToLower().Contains(Course.ToLower()))
+                                    {
+                                        Image = file;
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (Image != null)
-                        break;
-                    PageToken = Result.NextPageToken;
-                } while (string.IsNullOrEmpty(PageToken));
+                        if (Image != null)
+                            break;
+                        PageToken = Result.NextPageToken;
+                    } while (string.IsNullOrEmpty(PageToken));
 
-                if (Image != null)
-                {
-                    var GetRequest = Service.Files.Get(Image.Id);
-                    GetRequest.Download(Stream = new System.IO.MemoryStream());
+                    if (Image != null)
+                    {
+                        var GetRequest = Service.Files.Get(Image.Id);
+                        GetRequest.Download(Stream = new System.IO.MemoryStream());
+                    }
+                    if (Stream != null)
+                        return Stream;
+                    return null;
                 }
-                if (Stream != null)
-                    return Stream;
-                return null;
+                catch (Google.GoogleApiException ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
+                catch (System.Net.Http.HttpRequestException ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
             }
-            catch (Google.GoogleApiException ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            else
                 return null;
-            }
-            catch (System.Net.Http.HttpRequestException ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                return null;
-            }
-            
         }
     }
 

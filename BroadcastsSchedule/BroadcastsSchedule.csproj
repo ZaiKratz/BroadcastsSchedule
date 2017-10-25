@@ -136,11 +136,11 @@
     </Compile>
     <Compile Include="CalendarColumn.cs" />
     <Compile Include="GoogleDrive.cs" />
-    <Compile Include="EditTablesID.cs">
+    <Compile Include="EditIDs.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditTablesID.Designer.cs">
-      <DependentUpon>EditTablesID.cs</DependentUpon>
+    <Compile Include="EditIDs.Designer.cs">
+      <DependentUpon>EditIDs.cs</DependentUpon>
     </Compile>
     <Compile Include="EMailsEditing.cs">
       <SubType>Form</SubType>
@@ -162,8 +162,8 @@
     <EmbeddedResource Include="Accounts.resx">
       <DependentUpon>Accounts.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditTablesID.resx">
-      <DependentUpon>EditTablesID.cs</DependentUpon>
+    <EmbeddedResource Include="EditIDs.resx">
+      <DependentUpon>EditIDs.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EMailsEditing.resx">
       <DependentUpon>EMailsEditing.cs</DependentUpon>

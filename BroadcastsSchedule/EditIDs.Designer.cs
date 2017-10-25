@@ -1,6 +1,6 @@
 ﻿namespace BroadcastsSchedule
 {
-    partial class EditTablesID
+    partial class EditIDs
     {
         /// <summary>
         /// Required designer variable.
@@ -34,6 +34,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.SaveButton = new System.Windows.Forms.Button();
             this.Cancel_Button = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.FolderTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // EMailsIDTextBox
@@ -45,7 +47,7 @@
             // 
             // LecturesIDTextBox
             // 
-            this.LecturesIDTextBox.Location = new System.Drawing.Point(11, 92);
+            this.LecturesIDTextBox.Location = new System.Drawing.Point(11, 87);
             this.LecturesIDTextBox.Name = "LecturesIDTextBox";
             this.LecturesIDTextBox.Size = new System.Drawing.Size(394, 20);
             this.LecturesIDTextBox.TabIndex = 1;
@@ -62,7 +64,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(11, 76);
+            this.label2.Location = new System.Drawing.Point(11, 71);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(125, 13);
             this.label2.TabIndex = 3;
@@ -70,7 +72,7 @@
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(126, 118);
+            this.SaveButton.Location = new System.Drawing.Point(124, 165);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(75, 23);
             this.SaveButton.TabIndex = 4;
@@ -80,7 +82,7 @@
             // 
             // Cancel_Button
             // 
-            this.Cancel_Button.Location = new System.Drawing.Point(207, 118);
+            this.Cancel_Button.Location = new System.Drawing.Point(205, 165);
             this.Cancel_Button.Name = "Cancel_Button";
             this.Cancel_Button.Size = new System.Drawing.Size(75, 23);
             this.Cancel_Button.TabIndex = 5;
@@ -88,11 +90,29 @@
             this.Cancel_Button.UseVisualStyleBackColor = true;
             this.Cancel_Button.Click += new System.EventHandler(this.CancelButton_Click);
             // 
-            // EditTablesID
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(11, 123);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(134, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Youtube Pictures Folder ID";
+            // 
+            // FolderTextBox
+            // 
+            this.FolderTextBox.Location = new System.Drawing.Point(11, 139);
+            this.FolderTextBox.Name = "FolderTextBox";
+            this.FolderTextBox.Size = new System.Drawing.Size(394, 20);
+            this.FolderTextBox.TabIndex = 6;
+            // 
+            // EditIDs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(412, 151);
+            this.ClientSize = new System.Drawing.Size(412, 194);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.FolderTextBox);
             this.Controls.Add(this.Cancel_Button);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.label2);
@@ -101,11 +121,11 @@
             this.Controls.Add(this.EMailsIDTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(432, 194);
-            this.MinimumSize = new System.Drawing.Size(432, 194);
-            this.Name = "EditTablesID";
+            this.MaximumSize = new System.Drawing.Size(432, 237);
+            this.MinimumSize = new System.Drawing.Size(432, 237);
+            this.Name = "EditIDs";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "EditTablesID";
+            this.Text = "EditIDs";
             this.Load += new System.EventHandler(this.EditTablesID_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -120,5 +140,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.Button Cancel_Button;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox FolderTextBox;
     }
 }

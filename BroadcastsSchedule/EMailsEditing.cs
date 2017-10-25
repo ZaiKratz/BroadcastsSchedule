@@ -12,16 +12,15 @@ namespace BroadcastsSchedule
 {
     public partial class EMailsEditing : Form
     {
-        private Google.Apis.Sheets.v4.SheetsService SheetService = null;
         public EMailsEditing()
         {
             InitializeComponent();
-            SheetService = GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com");
+            //GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com").Wait();
         }
 
         private void EMailsEditing_Load(object sender, EventArgs e)
         {
-            var EMails = GoogleSheets.GetEMails(SheetService, Program.BSForm.GetCurrentCourse());
+            var EMails = GoogleSheets.GetEMails(Program.BSForm.GetCurrentCourse());
 
             foreach (var Item in EMails)
                 foreach (var Value in Item)
@@ -35,7 +34,7 @@ namespace BroadcastsSchedule
             EMails.Add(TMP.Split('\n'));
             try
             {
-                GoogleSheets.EditEmailsSheet(GoogleSheets.AuthenticateOauth(Program.BSForm.GetCurrentUser()), Program.BSForm.GetCurrentCourse(), EMails);
+                GoogleSheets.EditEmailsSheet(Program.BSForm.GetCurrentCourse(), EMails);
             }
             catch(Google.GoogleApiException ex)
             {

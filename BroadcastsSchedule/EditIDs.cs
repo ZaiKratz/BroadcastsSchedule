@@ -10,21 +10,27 @@ using System.Windows.Forms;
 
 namespace BroadcastsSchedule
 {
-    public partial class EditTablesID : Form
+    public partial class EditIDs : Form
     {
-        public EditTablesID()
+        public EditIDs()
         {
             InitializeComponent();
         }
 
         private void EditTablesID_Load(object sender, EventArgs e)
         {
-            List<string> IDs = null;
-            IDs = GoogleSheets.GetTablesIDs();
-            if (IDs != null)
+            List<string> TablesIDs = null;
+            TablesIDs = GoogleSheets.GetTablesIDs();
+            string FolderID = GoogleDrive.YouTubePicturesFolderID;
+
+            if (TablesIDs != null)
             {
-                EMailsIDTextBox.Text = IDs[0].ToString();
-                LecturesIDTextBox.Text = IDs[1].ToString();
+                EMailsIDTextBox.Text = TablesIDs[0].ToString();
+                LecturesIDTextBox.Text = TablesIDs[1].ToString();
+            }
+            if(FolderID != null)
+            {
+                FolderTextBox.Text = FolderID;
             }
         }
 
@@ -35,6 +41,7 @@ namespace BroadcastsSchedule
                 try
                 {
                     GoogleSheets.SetTablesIDs(EMailsIDTextBox.Text.ToString(), LecturesIDTextBox.Text.ToString());
+                    GoogleDrive.YouTubePicturesFolderID = FolderTextBox.Text.ToString();
                     MessageBox.Show("Saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Google.GoogleApiException ex)
