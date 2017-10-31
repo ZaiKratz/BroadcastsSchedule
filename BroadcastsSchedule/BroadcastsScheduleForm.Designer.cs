@@ -55,6 +55,7 @@
             this.CancelAuth = new System.Windows.Forms.Button();
             this.CurrentStatus = new System.Windows.Forms.StatusStrip();
             this.CurrentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new BroadcastsSchedule.AbortableBackgroundWorker();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).BeginInit();
@@ -109,7 +110,8 @@
             this.editLecturesToolStripMenuItem,
             this.editEmailsToolStripMenuItem,
             this.editTablesIDToolStripMenuItem,
-            this.editAccountsToolStripMenuItem});
+            this.editAccountsToolStripMenuItem,
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "Edit";
@@ -117,21 +119,21 @@
             // editCoursesToolStripMenuItem
             // 
             this.editCoursesToolStripMenuItem.Name = "editCoursesToolStripMenuItem";
-            this.editCoursesToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.editCoursesToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.editCoursesToolStripMenuItem.Text = "Edit Courses";
             this.editCoursesToolStripMenuItem.Visible = false;
             // 
             // editLecturesToolStripMenuItem
             // 
             this.editLecturesToolStripMenuItem.Name = "editLecturesToolStripMenuItem";
-            this.editLecturesToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.editLecturesToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.editLecturesToolStripMenuItem.Text = "Edit Lectures";
             this.editLecturesToolStripMenuItem.Visible = false;
             // 
             // editEmailsToolStripMenuItem
             // 
             this.editEmailsToolStripMenuItem.Name = "editEmailsToolStripMenuItem";
-            this.editEmailsToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.editEmailsToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.editEmailsToolStripMenuItem.Text = "Edit Emails";
             this.editEmailsToolStripMenuItem.Visible = false;
             this.editEmailsToolStripMenuItem.Click += new System.EventHandler(this.editEmailsToolStripMenuItem_Click);
@@ -139,14 +141,14 @@
             // editTablesIDToolStripMenuItem
             // 
             this.editTablesIDToolStripMenuItem.Name = "editTablesIDToolStripMenuItem";
-            this.editTablesIDToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.editTablesIDToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.editTablesIDToolStripMenuItem.Text = "Edit IDs";
             this.editTablesIDToolStripMenuItem.Click += new System.EventHandler(this.editTablesIDToolStripMenuItem_Click);
             // 
             // editAccountsToolStripMenuItem
             // 
             this.editAccountsToolStripMenuItem.Name = "editAccountsToolStripMenuItem";
-            this.editAccountsToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.editAccountsToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.editAccountsToolStripMenuItem.Text = "Edit Accounts";
             this.editAccountsToolStripMenuItem.Click += new System.EventHandler(this.editAccountsToolStripMenuItem_Click);
             // 
@@ -314,6 +316,13 @@
             this.CurrentStatusLabel.Name = "CurrentStatusLabel";
             this.CurrentStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
+            // changeGoogleSpreadSheetsAccountToolStripMenuItem
+            // 
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Name = "changeGoogleSpreadSheetsAccountToolStripMenuItem";
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Text = "Change Google Spreadsheet Account";
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Click += new System.EventHandler(this.changeGoogleSpreadSheetsAccountToolStripMenuItem_Click);
+            // 
             // backgroundWorker
             // 
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
@@ -388,6 +397,7 @@
         private System.Windows.Forms.Button CancelAuth;
         private System.Windows.Forms.StatusStrip CurrentStatus;
         private System.Windows.Forms.ToolStripStatusLabel CurrentStatusLabel;
+        private System.Windows.Forms.ToolStripMenuItem changeGoogleSpreadSheetsAccountToolStripMenuItem;
     }
 }
 

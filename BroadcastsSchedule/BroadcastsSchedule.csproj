@@ -154,6 +154,12 @@
     <Compile Include="BroadcastsScheduleForm.Designer.cs">
       <DependentUpon>BroadcastsScheduleForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GoogleSpreadsheetAccount.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GoogleSpreadsheetAccount.Designer.cs">
+      <DependentUpon>GoogleSpreadsheetAccount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GoogleSheets.cs" />
@@ -170,6 +176,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BroadcastsScheduleForm.resx">
       <DependentUpon>BroadcastsScheduleForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GoogleSpreadsheetAccount.resx">
+      <DependentUpon>GoogleSpreadsheetAccount.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

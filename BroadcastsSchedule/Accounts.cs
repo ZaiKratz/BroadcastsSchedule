@@ -20,11 +20,20 @@ namespace BroadcastsSchedule
         private void Accounts_Load(object sender, EventArgs e)
         {
             string[] lines = null;
-            lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
+            try
+            {
+                lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
 
-            if(lines != null)
-                for (int i = 0; i < lines.Length; i++)
-                    textBox1.AppendText(lines[i] + "\n");
+                if (lines != null)
+                    for (int i = 0; i < lines.Length; i++)
+                        textBox1.AppendText(lines[i] + "\n");
+            }
+            catch(System.IO.FileNotFoundException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
 
         }
 

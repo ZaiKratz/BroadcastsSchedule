@@ -13,7 +13,7 @@ namespace BroadcastsSchedule
     {
         private Google.Apis.YouTube.v3.Data.LiveBroadcast CurrentBroadcast = null;
         private Google.Apis.YouTube.v3.Data.LiveStream CurrentStream = null;
-        private string User = null;
+        private string YouTubeUser = null;
 
         private static object AuthLocker = new object();
         private static object LecturesLocker = new object();
@@ -187,7 +187,7 @@ namespace BroadcastsSchedule
         private void Accounts_List_SelectedIndexChanged(object sender, EventArgs e)
         {
             ClearAllData();
-            User = Accounts_List.SelectedItem.ToString();
+            YouTubeUser = Accounts_List.SelectedItem.ToString();
             if (!AuthServisesThread.IsAlive)
             {
                 AuthServisesThread = new Thread(Authenticate);
@@ -239,6 +239,13 @@ namespace BroadcastsSchedule
                 Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
             }
+            else
+            {
+                UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
+                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
+                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
+                CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
+            }
         }
 
 
@@ -269,8 +276,25 @@ namespace BroadcastsSchedule
                     )
                 );
 
-                GoogleSheets.AuthenticateOauth("3dmaya.com.ua@gmail.com").Wait();
-                GoogleYouTube.AuthenticateOauth(User).Wait();
+                string SpreadsheetUser = null;
+                try
+                {
+                    SpreadsheetUser = System.IO.File.ReadAllText(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\GoogleSpreadsheetAccount.txt");
+                    SpreadsheetUser = SpreadsheetUser.Replace("\n", "");
+                    GoogleSheets.AuthenticateOauth(SpreadsheetUser).Wait();
+                    GoogleYouTube.AuthenticateOauth(YouTubeUser).Wait();
+                }
+                catch (System.IO.FileNotFoundException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                catch (AggregateException)
+                {
+                    MessageBox.Show("Google spreadsheet account is wrong or empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    
+                    return;
+                }
 
                 Accounts_List.Invoke(
                     new Action(
@@ -656,37 +680,47 @@ namespace BroadcastsSchedule
         private void UpdateAccountsList()
         {
             string[] lines = null;
-            lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
-            if (lines.Length != 0)
-                if (Accounts_List.Items.Count == 0)
-                {
-                    for (int i = 0; i < lines.Length; i++)
+            try
+            {
+                lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
+                if (lines.Length != 0)
+                    if (Accounts_List.Items.Count == 0)
                     {
-                        if (lines[i] != string.Empty)
-                            Accounts_List.Items.Add(lines[i]);
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            if (lines[i] != string.Empty)
+                                Accounts_List.Items.Add(lines[i]);
+                        }
                     }
-                }
+                    else
+                    {
+                        Accounts_List.Items.Clear();
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            if (lines[i] != string.Empty)
+                                Accounts_List.Items.Add(lines[i]);
+                        }
+                    }
                 else
                 {
-                    Accounts_List.Items.Clear();
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        if (lines[i] != string.Empty)
-                            Accounts_List.Items.Add(lines[i]);
-                    }
+                    StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
+                    StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
+                    MessageBox.Show("No Accounts in " + System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt" + " file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-            else
+            }
+            catch(System.IO.FileNotFoundException ex)
             {
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
-                MessageBox.Show("No Accounts in " + System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt" + " file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
         }
         
         public string GetCurrentUser()
         {
-            return User;
+            return YouTubeUser;
         }
 
         public int GetCurrentCourse()
@@ -708,7 +742,11 @@ namespace BroadcastsSchedule
             CurrentStatusLabel.Text = Text;
         }
 
-        
+        private void changeGoogleSpreadSheetsAccountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GoogleSpreadsheetAccount GoogleAcc = new GoogleSpreadsheetAccount();
+            GoogleAcc.ShowDialog();
+        }
     }
 
 
