@@ -16,9 +16,9 @@ namespace BroadcastsSchedule
         private string YouTubeUser = null;
 
         private static object AuthLocker = new object();
-        private static object LecturesLocker = new object();
-        private static object CoursesLocker = new object();
-        private static object EmailsLocker = new object();
+//         private static object LecturesLocker = new object();
+//         private static object CoursesLocker = new object();
+//         private static object EmailsLocker = new object();
 
         private Thread AuthServisesThread = null;
 
@@ -31,36 +31,31 @@ namespace BroadcastsSchedule
         }
 
         private void BroadcastsScheduleClass_Load(object sender, EventArgs e)
-        {
-            
-            AuthServisesThread = new Thread(Authenticate);
-            AuthServisesThread.Start();
-            
-
+        {           
             UpdateAccountsList();
 
-            SetStatus("Select lecture and press \"Start Stream\" button");
-            if(Accounts_List.Items.Count > 0)
-                Accounts_List.SelectedIndex = 0;
+            if(AccountsList_ComboBox.Items.Count > 0)
+                AccountsList_ComboBox.SelectedIndex = 0;
+
             EndEventButton.Enabled = false;
             EndEventButton.BackColor = System.Drawing.Color.LightGray;
 
             CancelEventButton.Enabled = false;
             CancelEventButton.BackColor = System.Drawing.Color.LightGray;
 
-            LecturesGrid.Columns.Add("LecturesColumn", "Lectures");
+            Lectures_GridView.Columns.Add("LecturesColumn", "Lectures");
 
             CalendarColumn Date = new CalendarColumn();
             Date.HeaderText = "Date";
             TimeColumn Time = new TimeColumn();
             Time.HeaderText = "Time";
 
-            LecturesGrid.Columns.Add(Date);
-            LecturesGrid.Columns.Add(Time);
+            Lectures_GridView.Columns.Add(Date);
+            Lectures_GridView.Columns.Add(Time);
 
-            LecturesGrid.Columns.Add("DescriptionColumn", "Description");
+            Lectures_GridView.Columns.Add("DescriptionColumn", "Description");
 
-            //UpdateCoursesList();
+            SetStatus("Select lecture and press \"Start Stream\" button");
         }
 
         private void CoursesList_SelectedIndexChanged(object sender, EventArgs e)
@@ -71,24 +66,34 @@ namespace BroadcastsSchedule
         private void UpdateList_Click(object sender, EventArgs e)
         {
             UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
-            Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = false; }));
-            Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = false; }));
-            if (AuthServisesThread.IsAlive)
+            CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
+            AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = false; }));
+            if (AuthServisesThread != null)
             {
-                AuthServisesThread.Abort();
-                if (Accounts_List.Enabled == false)
+                if (AuthServisesThread.IsAlive)
                 {
-                    Accounts_List.Enabled = true;
+                    AuthServisesThread.Abort();
+                    AuthServisesThread = null;
+                    if (AccountsList_ComboBox.Enabled == false)
+                    {
+                        AccountsList_ComboBox.Enabled = true;
+                        UpdateAccountsList();
+                        if (AccountsList_ComboBox.Items.Count > 0)
+                            AccountsList_ComboBox.SelectedIndex = 0;
+                    }
+                }
+                else
+                {
                     UpdateAccountsList();
-                    if(Accounts_List.Items.Count > 0)
-                        Accounts_List.SelectedIndex = 0;
-                }                
+                    if (AccountsList_ComboBox.Items.Count > 0)
+                        AccountsList_ComboBox.SelectedIndex = 0;
+                }
             }
             else
             {
                 UpdateAccountsList();
-                if (Accounts_List.Items.Count > 0)
-                    Accounts_List.SelectedIndex = 0;
+                if (AccountsList_ComboBox.Items.Count > 0)
+                    AccountsList_ComboBox.SelectedIndex = 0;
             }
         }
 
@@ -117,6 +122,7 @@ namespace BroadcastsSchedule
             if(AuthServisesThread.IsAlive)
             {
                 AuthServisesThread.Abort();
+                AuthServisesThread = null;
             } 
 
             if (CurrentBroadcast != null)
@@ -169,12 +175,13 @@ namespace BroadcastsSchedule
         private void CopyToClipboardButton_Click(object sender, EventArgs e)
         {
             string Items = string.Empty;
-            foreach (var Item in EMails_List.Items)
+            foreach (var Item in EMailsList_ListView.Items)
                 Items += Item.ToString() + "\n";
             if(Items != string.Empty)
             {
                 Items = Items.Remove(Items.Length - 1);
                 Clipboard.SetText(Items);
+                SetStatus("Emails copied to clipboard");
             }
         }
 
@@ -187,8 +194,13 @@ namespace BroadcastsSchedule
         private void Accounts_List_SelectedIndexChanged(object sender, EventArgs e)
         {
             ClearAllData();
-            YouTubeUser = Accounts_List.SelectedItem.ToString();
-            if (!AuthServisesThread.IsAlive)
+            YouTubeUser = AccountsList_ComboBox.SelectedItem.ToString();
+            if (AuthServisesThread != null)
+            {
+                AuthServisesThread.Abort();
+                AuthServisesThread = null;
+            }
+            if (AuthServisesThread == null)
             {
                 AuthServisesThread = new Thread(Authenticate);
                 AuthServisesThread.Start();
@@ -234,16 +246,17 @@ namespace BroadcastsSchedule
             if(AuthServisesThread.IsAlive)
             {
                 AuthServisesThread.Abort();
+                AuthServisesThread = null;
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
-                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
+                AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = true; }));
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
             }
             else
             {
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
-                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
+                AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = true; }));
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
             }
         }
@@ -255,7 +268,7 @@ namespace BroadcastsSchedule
             {
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = false; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
                 StartEventButton.Invoke(
                     new Action(
                         delegate ()
@@ -267,11 +280,11 @@ namespace BroadcastsSchedule
                 );
                 //StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; });
 
-                Accounts_List.Invoke(
+                AccountsList_ComboBox.Invoke(
                     new Action(
                         delegate ()
                         {
-                            Accounts_List.Enabled = false;
+                            AccountsList_ComboBox.Enabled = false;
                         }
                     )
                 );
@@ -292,15 +305,14 @@ namespace BroadcastsSchedule
                 catch (AggregateException)
                 {
                     MessageBox.Show("Google spreadsheet account is wrong or empty!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    
                     return;
                 }
 
-                Accounts_List.Invoke(
+                AccountsList_ComboBox.Invoke(
                     new Action(
                         delegate ()
                         {
-                            Accounts_List.Enabled = true;
+                            AccountsList_ComboBox.Enabled = true;
                         }
                     )
                 );
@@ -327,34 +339,39 @@ namespace BroadcastsSchedule
 
                 if (CoursesList != null)
                 {
-                    if (Courses_List.Items.Count > 0)
-                        Courses_List.Invoke(
+                    if (CoursesList_ComboBox.Items.Count > 0)
+                    {
+                        CoursesList_ComboBox.Invoke(
                                         new Action(
                                             delegate ()
                                             {
-                                                Courses_List.Items.Clear();
+                                                CoursesList_ComboBox.Items.Clear();
                                             }
                                         )
                                     );
+                    }
 
                     foreach (var Item in CoursesList)
-                        Courses_List.Invoke(
+                    {
+                        CoursesList_ComboBox.Invoke(
                                     new Action(
                                         delegate ()
                                         {
-                                            Courses_List.Items.AddRange(Item.ToArray());
+                                            CoursesList_ComboBox.Items.AddRange(Item.ToArray());
                                         }
                                     )
                                 );
+                    }
 
-                    Courses_List.Invoke(
+                    CoursesList_ComboBox.Invoke(
                                 new Action(
                                     delegate ()
                                     {
-                                        Courses_List.SelectedIndex = 0;
+                                        CoursesList_ComboBox.SelectedIndex = 0;
                                     }
                                 )
                             );
+                    
                 }
             }
         }
@@ -365,33 +382,33 @@ namespace BroadcastsSchedule
             {
                 var SelectedItem = "";
 
-                if (Courses_List.Items.Count != 0)
+                if (CoursesList_ComboBox.Items.Count != 0)
                 {
-                    Courses_List.Invoke(
+                    CoursesList_ComboBox.Invoke(
                                     new Action(
                                         delegate ()
                                         {
-                                            SelectedItem = Courses_List.SelectedItem.ToString();
+                                            SelectedItem = CoursesList_ComboBox.SelectedItem.ToString();
                                         }
                                     )
                                 );
                     var LecturesList = GoogleSheets.GetLectures(SelectedItem);
 
                     var LecturesCount = 0;
-                    LecturesGrid.Invoke(
+                    Lectures_GridView.Invoke(
                         new Action(
                             delegate ()
                             {
-                                LecturesCount = LecturesGrid.Rows.Count;
+                                LecturesCount = Lectures_GridView.Rows.Count;
                             }
                         )
                     );
                     if (LecturesCount > 0)
-                        LecturesGrid.Invoke(
+                        Lectures_GridView.Invoke(
                             new Action(
                                 delegate ()
                                 {
-                                    LecturesGrid.Rows.Clear();
+                                    Lectures_GridView.Rows.Clear();
                                 }
                             )
                     );
@@ -432,7 +449,7 @@ namespace BroadcastsSchedule
                         if (tmpdate != string.Empty)
                             Date = DateTime.ParseExact(
                                Item.ElementAtOrDefault(1).ToString(),
-                               "dd.MM",
+                               "dd.MM.yyyy",
                                null);
 
                         if (tmptime != string.Empty)
@@ -440,11 +457,11 @@ namespace BroadcastsSchedule
                             Item.ElementAtOrDefault(2).ToString(), 
                             System.Globalization.CultureInfo.InvariantCulture);
 
-                        LecturesGrid.Invoke(
+                        Lectures_GridView.Invoke(
                                     new Action(
                                         delegate ()
                                         {
-                                            LecturesGrid.Rows.Add(
+                                            Lectures_GridView.Rows.Add(
                                                 Item.ElementAtOrDefault(0).ToString(),
                                                 Date,
                                                 Time,
@@ -462,32 +479,32 @@ namespace BroadcastsSchedule
             //lock (EmailsLocker)
             {
                 var SelIndex = 0;
-                Courses_List.Invoke(
+                CoursesList_ComboBox.Invoke(
                     new Action(
                         delegate ()
                         {
-                            SelIndex = Courses_List.SelectedIndex;
+                            SelIndex = CoursesList_ComboBox.SelectedIndex;
                         }
                     )
                 );
 
                 var EMailList = GoogleSheets.GetEMails(SelIndex);
                 var EmailsCount = 0;
-                EMails_List.Invoke(
+                EMailsList_ListView.Invoke(
                     new Action(
                         delegate ()
                         {
-                            EmailsCount = EMails_List.Items.Count;
+                            EmailsCount = EMailsList_ListView.Items.Count;
                         }
                     )
                 );
 
                 if (EmailsCount > 0)
-                    EMails_List.Invoke(
+                    EMailsList_ListView.Invoke(
                         new Action(
                             delegate ()
                             {
-                                EMails_List.Items.Clear();
+                                EMailsList_ListView.Items.Clear();
                             }
                         )
                     );
@@ -495,26 +512,26 @@ namespace BroadcastsSchedule
                 if (EMailList != null)
                 {
                     foreach (var Item in EMailList)
-                        EMails_List.Invoke(
+                        EMailsList_ListView.Invoke(
                             new Action(
                                 delegate ()
                                 {
-                                    EMails_List.Items.AddRange(Item.ToArray());
+                                    EMailsList_ListView.Items.AddRange(Item.ToArray());
                                 }
                             )
                         );
                 }
   
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
             }
         }
 
         private void CreateLiveEventAsync()
         {
-            Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = false; }));
+            CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
             UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
-            Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = false; }));
+            AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = false; }));
 
             StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
             StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
@@ -529,37 +546,37 @@ namespace BroadcastsSchedule
             DateTime ScheduledDateTime = DateTime.Now;
 
 
-            LecturesGrid.Invoke(
+            Lectures_GridView.Invoke(
                 new Action(
                     delegate ()
                     {
-                        StreamTitle = Courses_List.SelectedItem.ToString();
+                        StreamTitle = CoursesList_ComboBox.SelectedItem.ToString();
                     }
                 )
             );
-            LecturesGrid.Invoke(
+            Lectures_GridView.Invoke(
                 new Action(
                     delegate ()
                     {
-                        Name = LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[0].Value.ToString();
+                        Name = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[0].Value.ToString();
                     }
                 )
             );
-            LecturesGrid.Invoke(
+            Lectures_GridView.Invoke(
                 new Action(
                     delegate ()
                     {
-                        Description = LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[3].Value.ToString();
+                        Description = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[3].Value.ToString();
                     }
                 )
             );
 
             DateTime Date = DateTime.MinValue;
-            LecturesGrid.Invoke(
+            Lectures_GridView.Invoke(
                 new Action(
                     delegate ()
                     {
-                        string tmp = LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[1].Value.ToString();
+                        string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[1].Value.ToString();
                         if(tmp != null)
                             Date = DateTime.Parse(tmp);
                     }
@@ -567,11 +584,11 @@ namespace BroadcastsSchedule
             );
 
             DateTime Time = DateTime.MinValue;
-            LecturesGrid.Invoke(
+            Lectures_GridView.Invoke(
                 new Action(
                     delegate ()
                     {
-                        string tmp = LecturesGrid.Rows[LecturesGrid.SelectedCells[0].RowIndex].Cells[2].Value.ToString();
+                        string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[2].Value.ToString();
                         if (tmp != null)
                             Time = DateTime.Parse(tmp);
                     }
@@ -621,9 +638,9 @@ namespace BroadcastsSchedule
                 EndEventButton.Invoke(new Action(delegate () { EndEventButton.Enabled = false; }));
                 EndEventButton.Invoke(new Action(delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; }));
 
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
-                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
+                AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = true; }));
 
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = false; }));
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; }));
@@ -657,9 +674,9 @@ namespace BroadcastsSchedule
                 EndEventButton.Invoke(new Action(delegate () { EndEventButton.Enabled = false; }));
                 EndEventButton.Invoke(new Action(delegate () { EndEventButton.BackColor = System.Drawing.Color.LightGray; }));
 
-                Courses_List.Invoke(new Action(delegate () { Courses_List.Enabled = true; }));
+                CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
-                Accounts_List.Invoke(new Action(delegate () { Accounts_List.Enabled = true; }));
+                AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = true; }));
 
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = false; }));
                 CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; }));
@@ -669,12 +686,12 @@ namespace BroadcastsSchedule
 
         private void ClearAllData()
         {
-            if (LecturesGrid.Rows.Count > 0)
-                LecturesGrid.Rows.Clear();
-            if (EMails_List.Items.Count > 0)
-                EMails_List.Items.Clear();
-            if (Courses_List.Items.Count > 0)
-                Courses_List.Items.Clear();
+            if (Lectures_GridView.Rows.Count > 0)
+                Lectures_GridView.Rows.Clear();
+            if (EMailsList_ListView.Items.Count > 0)
+                EMailsList_ListView.Items.Clear();
+            if (CoursesList_ComboBox.Items.Count > 0)
+                CoursesList_ComboBox.Items.Clear();
         }
 
         private void UpdateAccountsList()
@@ -684,21 +701,21 @@ namespace BroadcastsSchedule
             {
                 lines = System.IO.File.ReadAllLines(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\Accounts.txt");
                 if (lines.Length != 0)
-                    if (Accounts_List.Items.Count == 0)
+                    if (AccountsList_ComboBox.Items.Count == 0)
                     {
                         for (int i = 0; i < lines.Length; i++)
                         {
                             if (lines[i] != string.Empty)
-                                Accounts_List.Items.Add(lines[i]);
+                                AccountsList_ComboBox.Items.Add(lines[i]);
                         }
                     }
                     else
                     {
-                        Accounts_List.Items.Clear();
+                        AccountsList_ComboBox.Items.Clear();
                         for (int i = 0; i < lines.Length; i++)
                         {
                             if (lines[i] != string.Empty)
-                                Accounts_List.Items.Add(lines[i]);
+                                AccountsList_ComboBox.Items.Add(lines[i]);
                         }
                     }
                 else
@@ -726,11 +743,11 @@ namespace BroadcastsSchedule
         public int GetCurrentCourse()
         {
             int SelIndex = 0;
-            Courses_List.Invoke(
+            CoursesList_ComboBox.Invoke(
                 new Action(
                     delegate ()
                     {
-                        SelIndex = Courses_List.SelectedIndex;
+                        SelIndex = CoursesList_ComboBox.SelectedIndex;
                     }
                 )
             );

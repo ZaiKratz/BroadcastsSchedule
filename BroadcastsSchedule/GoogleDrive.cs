@@ -83,8 +83,8 @@ namespace BroadcastsSchedule
                         {
                             foreach (var parent in file.Parents)
                             {
-                                if (parent.Id == YouTubePicturesFolderID)
-                                {
+                                if (parent.Id == _YouTubePicturesFolderID)
+                                {     
                                     if (file.Title.ToLower().Contains(Course.ToLower()))
                                     {
                                         Image = file;
@@ -93,8 +93,7 @@ namespace BroadcastsSchedule
                                 }
                             }
                         }
-                        if (Image != null)
-                            break;
+
                         PageToken = Result.NextPageToken;
                     } while (string.IsNullOrEmpty(PageToken));
 

@@ -242,6 +242,13 @@ namespace BroadcastsSchedule
                         return;
                     }
                 }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Stream is not found.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                    Broadcast = null;
+                    return;
+                }
             }
             else
             {
@@ -286,7 +293,7 @@ namespace BroadcastsSchedule
 
                     foreach (var Item in ReturnedResponce.Items)
                     {
-                        if (Item.Snippet.Title.ToString().ToLower().Contains(StreamTitle.ToLower()))
+                        if (Item.Snippet.Title.ToString().ToLower() == (StreamTitle.ToLower()))
                             return Item;
                     }
                 }

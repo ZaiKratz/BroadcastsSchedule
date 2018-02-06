@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BroadcastsScheduleClass));
             this.UpdateButton = new System.Windows.Forms.Button();
-            this.Courses_List = new System.Windows.Forms.ComboBox();
+            this.CoursesList_ComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,25 +40,25 @@
             this.editEmailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editTablesIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editAccountsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.EMails_List = new System.Windows.Forms.ListBox();
-            this.LecturesGrid = new System.Windows.Forms.DataGridView();
+            this.EMailsList_ListView = new System.Windows.Forms.ListBox();
+            this.Lectures_GridView = new System.Windows.Forms.DataGridView();
             this.StartEventButton = new System.Windows.Forms.Button();
             this.EndEventButton = new System.Windows.Forms.Button();
             this.CancelEventButton = new System.Windows.Forms.Button();
             this.CopyToClipboardButton = new System.Windows.Forms.Button();
-            this.Accounts_List = new System.Windows.Forms.ComboBox();
+            this.AccountsList_ComboBox = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.BroadcastSettingsLink = new System.Windows.Forms.LinkLabel();
             this.CancelAuth = new System.Windows.Forms.Button();
             this.CurrentStatus = new System.Windows.Forms.StatusStrip();
             this.CurrentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.changeGoogleSpreadSheetsAccountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new BroadcastsSchedule.AbortableBackgroundWorker();
             this.menuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Lectures_GridView)).BeginInit();
             this.CurrentStatus.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -74,15 +74,15 @@
             this.UpdateButton.UseVisualStyleBackColor = true;
             this.UpdateButton.Click += new System.EventHandler(this.UpdateList_Click);
             // 
-            // Courses_List
+            // CoursesList_ComboBox
             // 
-            this.Courses_List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Courses_List.FormattingEnabled = true;
-            this.Courses_List.Location = new System.Drawing.Point(12, 41);
-            this.Courses_List.Name = "Courses_List";
-            this.Courses_List.Size = new System.Drawing.Size(121, 21);
-            this.Courses_List.TabIndex = 1;
-            this.Courses_List.SelectedIndexChanged += new System.EventHandler(this.CoursesList_SelectedIndexChanged);
+            this.CoursesList_ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.CoursesList_ComboBox.FormattingEnabled = true;
+            this.CoursesList_ComboBox.Location = new System.Drawing.Point(12, 41);
+            this.CoursesList_ComboBox.Name = "CoursesList_ComboBox";
+            this.CoursesList_ComboBox.Size = new System.Drawing.Size(121, 21);
+            this.CoursesList_ComboBox.TabIndex = 1;
+            this.CoursesList_ComboBox.SelectedIndexChanged += new System.EventHandler(this.CoursesList_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -152,6 +152,13 @@
             this.editAccountsToolStripMenuItem.Text = "Edit Accounts";
             this.editAccountsToolStripMenuItem.Click += new System.EventHandler(this.editAccountsToolStripMenuItem_Click);
             // 
+            // changeGoogleSpreadSheetsAccountToolStripMenuItem
+            // 
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Name = "changeGoogleSpreadSheetsAccountToolStripMenuItem";
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Text = "Change Google Spreadsheet Account";
+            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Click += new System.EventHandler(this.changeGoogleSpreadSheetsAccountToolStripMenuItem_Click);
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -171,29 +178,29 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "Available EMails";
             // 
-            // EMails_List
+            // EMailsList_ListView
             // 
-            this.EMails_List.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.EMails_List.FormattingEnabled = true;
-            this.EMails_List.Location = new System.Drawing.Point(537, 100);
-            this.EMails_List.Name = "EMails_List";
-            this.EMails_List.Size = new System.Drawing.Size(315, 134);
-            this.EMails_List.TabIndex = 7;
+            this.EMailsList_ListView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.EMailsList_ListView.FormattingEnabled = true;
+            this.EMailsList_ListView.Location = new System.Drawing.Point(537, 100);
+            this.EMailsList_ListView.Name = "EMailsList_ListView";
+            this.EMailsList_ListView.Size = new System.Drawing.Size(315, 134);
+            this.EMailsList_ListView.TabIndex = 7;
             // 
-            // LecturesGrid
+            // Lectures_GridView
             // 
-            this.LecturesGrid.AllowUserToAddRows = false;
-            this.LecturesGrid.AllowUserToDeleteRows = false;
-            this.LecturesGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.Lectures_GridView.AllowUserToAddRows = false;
+            this.Lectures_GridView.AllowUserToDeleteRows = false;
+            this.Lectures_GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.LecturesGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.LecturesGrid.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.LecturesGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.LecturesGrid.Location = new System.Drawing.Point(12, 100);
-            this.LecturesGrid.Name = "LecturesGrid";
-            this.LecturesGrid.Size = new System.Drawing.Size(516, 304);
-            this.LecturesGrid.TabIndex = 8;
+            this.Lectures_GridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.Lectures_GridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.Lectures_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Lectures_GridView.Location = new System.Drawing.Point(12, 100);
+            this.Lectures_GridView.Name = "Lectures_GridView";
+            this.Lectures_GridView.Size = new System.Drawing.Size(516, 304);
+            this.Lectures_GridView.TabIndex = 8;
             // 
             // StartEventButton
             // 
@@ -246,16 +253,16 @@
             this.CopyToClipboardButton.UseVisualStyleBackColor = true;
             this.CopyToClipboardButton.Click += new System.EventHandler(this.CopyToClipboardButton_Click);
             // 
-            // Accounts_List
+            // AccountsList_ComboBox
             // 
-            this.Accounts_List.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Accounts_List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Accounts_List.FormattingEnabled = true;
-            this.Accounts_List.Location = new System.Drawing.Point(681, 40);
-            this.Accounts_List.Name = "Accounts_List";
-            this.Accounts_List.Size = new System.Drawing.Size(171, 21);
-            this.Accounts_List.TabIndex = 15;
-            this.Accounts_List.SelectedIndexChanged += new System.EventHandler(this.Accounts_List_SelectedIndexChanged);
+            this.AccountsList_ComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.AccountsList_ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.AccountsList_ComboBox.FormattingEnabled = true;
+            this.AccountsList_ComboBox.Location = new System.Drawing.Point(681, 40);
+            this.AccountsList_ComboBox.Name = "AccountsList_ComboBox";
+            this.AccountsList_ComboBox.Size = new System.Drawing.Size(171, 21);
+            this.AccountsList_ComboBox.TabIndex = 15;
+            this.AccountsList_ComboBox.SelectedIndexChanged += new System.EventHandler(this.Accounts_List_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -316,13 +323,6 @@
             this.CurrentStatusLabel.Name = "CurrentStatusLabel";
             this.CurrentStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
-            // changeGoogleSpreadSheetsAccountToolStripMenuItem
-            // 
-            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Name = "changeGoogleSpreadSheetsAccountToolStripMenuItem";
-            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
-            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Text = "Change Google Spreadsheet Account";
-            this.changeGoogleSpreadSheetsAccountToolStripMenuItem.Click += new System.EventHandler(this.changeGoogleSpreadSheetsAccountToolStripMenuItem_Click);
-            // 
             // backgroundWorker
             // 
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
@@ -336,17 +336,17 @@
             this.Controls.Add(this.CancelAuth);
             this.Controls.Add(this.BroadcastSettingsLink);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.Accounts_List);
+            this.Controls.Add(this.AccountsList_ComboBox);
             this.Controls.Add(this.CopyToClipboardButton);
             this.Controls.Add(this.CancelEventButton);
             this.Controls.Add(this.EndEventButton);
             this.Controls.Add(this.StartEventButton);
-            this.Controls.Add(this.LecturesGrid);
-            this.Controls.Add(this.EMails_List);
+            this.Controls.Add(this.Lectures_GridView);
+            this.Controls.Add(this.EMailsList_ListView);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.Courses_List);
+            this.Controls.Add(this.CoursesList_ComboBox);
             this.Controls.Add(this.UpdateButton);
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -361,7 +361,7 @@
             this.Resize += new System.EventHandler(this.BroadcastsScheduleClass_Resize);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LecturesGrid)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Lectures_GridView)).EndInit();
             this.CurrentStatus.ResumeLayout(false);
             this.CurrentStatus.PerformLayout();
             this.ResumeLayout(false);
@@ -372,14 +372,14 @@
         #endregion
 
         private System.Windows.Forms.Button UpdateButton;
-        private System.Windows.Forms.ComboBox Courses_List;
+        private System.Windows.Forms.ComboBox CoursesList_ComboBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ListBox EMails_List;
-        private System.Windows.Forms.DataGridView LecturesGrid;
+        private System.Windows.Forms.ListBox EMailsList_ListView;
+        private System.Windows.Forms.DataGridView Lectures_GridView;
         private AbortableBackgroundWorker backgroundWorker;
         private System.Windows.Forms.Button StartEventButton;
         private System.Windows.Forms.Button EndEventButton;
@@ -388,7 +388,7 @@
         private System.Windows.Forms.ToolStripMenuItem editLecturesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editEmailsToolStripMenuItem;
         private System.Windows.Forms.Button CopyToClipboardButton;
-        private System.Windows.Forms.ComboBox Accounts_List;
+        private System.Windows.Forms.ComboBox AccountsList_ComboBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ToolStripMenuItem editTablesIDToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editAccountsToolStripMenuItem;

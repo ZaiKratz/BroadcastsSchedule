@@ -70,7 +70,10 @@ namespace BroadcastsSchedule
                     var Values = RequestValues.Values;
                     Courses = new List<List<object>>();
                     foreach (var Item in Values)
-                        Courses.Add(Item.ToList());
+                    {
+                        if(Item.Count > 0)
+                            Courses.Add(Item.ToList());
+                    }
                 }
                 catch (Google.GoogleApiException ex)
                 {
@@ -141,7 +144,10 @@ namespace BroadcastsSchedule
                     {
                         Emails = new List<List<object>>();
                         foreach (var Item in Values)
-                            Emails.Add(Item.ToList());
+                        {
+                            if(Item.Count > 0)
+                                Emails.Add(Item.ToList());
+                        }
                     }
                 }
                 catch (Google.GoogleApiException ex)
@@ -180,13 +186,16 @@ namespace BroadcastsSchedule
                     if (Values != null)
                         foreach (var Item in Values)
                         {
-                            if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
+                            if(Item.Count > 0)
                             {
-                                LectureName = Item.ElementAtOrDefault(1) != null ? Item.ElementAtOrDefault(1).ToString() : "";
-                                LectureDate = Item.ElementAtOrDefault(2) != null ? Item.ElementAtOrDefault(2).ToString() : "";
-                                LectureTime = Item.ElementAtOrDefault(3) != null ? Item.ElementAtOrDefault(3).ToString() : "";
-                                LectureDescription = Item.ElementAtOrDefault(4) != null ? Item.ElementAtOrDefault(4).ToString() : "";
-                                Lectures.Add(new List<object> { LectureName, LectureDate, LectureTime, LectureDescription });
+                                if (Item[0].ToString().ToLower().Contains(Course.ToLower()))
+                                {
+                                    LectureName = Item.ElementAtOrDefault(1) != null ? Item.ElementAtOrDefault(1).ToString() : "";
+                                    LectureDate = Item.ElementAtOrDefault(2) != null ? Item.ElementAtOrDefault(2).ToString() : "";
+                                    LectureTime = Item.ElementAtOrDefault(3) != null ? Item.ElementAtOrDefault(3).ToString() : "";
+                                    LectureDescription = Item.ElementAtOrDefault(4) != null ? Item.ElementAtOrDefault(4).ToString() : "";
+                                    Lectures.Add(new List<object> { LectureName, LectureDate, LectureTime, LectureDescription });
+                                }
                             }
 
                         }
