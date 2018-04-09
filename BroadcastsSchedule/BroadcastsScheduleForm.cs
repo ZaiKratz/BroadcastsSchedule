@@ -9,6 +9,15 @@ using System.Windows.Forms;
 
 namespace BroadcastsSchedule
 {
+    public struct BroadcastData
+    {
+        public string streamTitle;
+        public string broadcastName;
+        public DateTime scheduledDateTime;
+        public string broadcastDescription;
+    }
+
+
     public partial class BroadcastsScheduleClass : Form
     {
         private Google.Apis.YouTube.v3.Data.LiveBroadcast CurrentBroadcast = null;
@@ -112,7 +121,7 @@ namespace BroadcastsSchedule
             CancelLiveEventCreation();
         }
 
-        private void backgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void BackgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             CreateLiveEventAsync();
         }
@@ -185,7 +194,7 @@ namespace BroadcastsSchedule
             }
         }
 
-        private void editEmailsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void EditEmailsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //EMailsEditing EMails = new EMailsEditing();
             //EMails.ShowDialog();
@@ -208,13 +217,13 @@ namespace BroadcastsSchedule
 
         }
 
-        private void editTablesIDToolStripMenuItem_Click(object sender, EventArgs e)
+        private void EditTablesIDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             EditIDs Edit = new EditIDs();
             Edit.ShowDialog();
         }
 
-        private void editAccountsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void EditAccountsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Accounts Acc = new Accounts();
             Acc.ShowDialog();
@@ -597,17 +606,22 @@ namespace BroadcastsSchedule
 
             ScheduledDateTime = new DateTime(Date.Year, Date.Month, Date.Day, Time.Hour, Time.Minute, Time.Second).ToUniversalTime();
 
+            BroadcastData broadcastData = new BroadcastData()
+            {
+                streamTitle = StreamTitle,
+                broadcastName = Name,
+                scheduledDateTime = ScheduledDateTime,
+                broadcastDescription = Description
+            };
 
             GoogleYouTube.CreateLiveEvent(
                 ref CurrentBroadcast,
-                    StreamTitle,
-                    Name,
-                    ScheduledDateTime,
-                    Description);
+                    broadcastData
+            );
 
             if (CurrentBroadcast != null)
             {
-                BroadcastSettingsLink.Invoke(new Action(delegate () { BroadcastSettingsLink.Enabled = true; }));
+                SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
                 CurrentStream = GoogleYouTube.GetStreamByTitle(StreamTitle);
                 if (CurrentBroadcast != null)
                 {
@@ -631,7 +645,7 @@ namespace BroadcastsSchedule
 
             if (CurrentBroadcast != null)
             {
-                BroadcastSettingsLink.Invoke(new Action(delegate () { BroadcastSettingsLink.Enabled = false; }));
+                SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = false; }));
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = true; }));
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LimeGreen; }));
 
@@ -667,7 +681,7 @@ namespace BroadcastsSchedule
             }
             if (CurrentBroadcast == null)
             {
-                BroadcastSettingsLink.Invoke(new Action(delegate () { BroadcastSettingsLink.Enabled = false; }));
+                SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = false; }));
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = true; }));
                 StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LimeGreen; }));
 

@@ -57,18 +57,18 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(11, 17);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(177, 13);
+            this.label1.Size = new System.Drawing.Size(174, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "EMails and Courses Spreadsheet ID";
+            this.label1.Text = "EMails and courses spreadsheet ID";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(11, 71);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(125, 13);
+            this.label2.Size = new System.Drawing.Size(123, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Lectures Spreadsheet ID";
+            this.label2.Text = "Lectures spreadsheet ID";
             // 
             // SaveButton
             // 
@@ -95,9 +95,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(11, 123);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 13);
+            this.label3.Size = new System.Drawing.Size(130, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "Youtube Pictures Folder ID";
+            this.label3.Text = "Youtube pictures folder ID";
             // 
             // FolderTextBox
             // 
@@ -125,7 +125,7 @@
             this.MinimumSize = new System.Drawing.Size(432, 237);
             this.Name = "EditIDs";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "EditIDs";
+            this.Text = "Edit IDs";
             this.Load += new System.EventHandler(this.EditTablesID_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

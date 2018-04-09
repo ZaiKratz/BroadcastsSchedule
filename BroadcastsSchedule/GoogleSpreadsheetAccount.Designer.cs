@@ -46,9 +46,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 16);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(72, 13);
+            this.label1.Size = new System.Drawing.Size(71, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "New Account";
+            this.label1.Text = "New account";
             // 
             // SaveButton
             // 
@@ -84,7 +84,7 @@
             this.MinimumSize = new System.Drawing.Size(345, 130);
             this.Name = "GoogleSpreadsheetAccount";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "GoogleSpreadsheetAccount";
+            this.Text = "Google spreadsheet account";
             this.Load += new System.EventHandler(this.GoogleSpreadsheetAccount_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

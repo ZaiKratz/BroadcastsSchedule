@@ -99,7 +99,6 @@ namespace BroadcastsSchedule
             return Broadcast;
         }
         
-
         public static LiveBroadcast EndEvent(string BroadcastId)
         {
             Program.BSForm.SetStatus("Ending Stream...");
@@ -157,29 +156,41 @@ namespace BroadcastsSchedule
             return false;
         }
 
-        public static void CreateLiveEvent(ref LiveBroadcast Broadcast, string CourseName, string Name, DateTime Date, string Description)
+        public static void CreateBunchOfLiveEvents()
+        {
+
+        }
+
+        public static void CreateLiveEvent(ref LiveBroadcast Broadcast, BroadcastData broadcastData)
         {
             if(Service != null)
             {
-                var Stream = GetStreamByTitle(CourseName);
+                var Stream = GetStreamByTitle(broadcastData.streamTitle);
                 if(Stream != null)
                 {
-                    Broadcast = new LiveBroadcast();
+                    Broadcast = new LiveBroadcast
+                    {
+                        Snippet = new LiveBroadcastSnippet
+                        {
+                            Title = broadcastData.broadcastName,
+                            Description = broadcastData.broadcastDescription,
+                            ScheduledStartTime = broadcastData.scheduledDateTime.ToUniversalTime()
+                        },
 
-                    Broadcast.Snippet = new LiveBroadcastSnippet();
-                    Broadcast.Snippet.Title = Name;
-                    Broadcast.Snippet.Description = Description;
-                    Broadcast.Snippet.ScheduledStartTime = Date.ToUniversalTime();
 
+                        Status = new LiveBroadcastStatus
+                        {
+                            PrivacyStatus = "private"
+                        },
 
-                    Broadcast.Status = new LiveBroadcastStatus();
-                    Broadcast.Status.PrivacyStatus = "private";
+                        ContentDetails = new LiveBroadcastContentDetails
+                        {
+                            RecordFromStart = true,
+                            EnableDvr = true
+                        },
 
-                    Broadcast.ContentDetails = new LiveBroadcastContentDetails();
-                    Broadcast.ContentDetails.RecordFromStart = true;
-                    Broadcast.ContentDetails.EnableDvr = true;
-
-                    Broadcast.Kind = "youtube#liveBroadcast";
+                        Kind = "youtube#liveBroadcast"
+                    };
 
                     try
                     {
@@ -194,7 +205,7 @@ namespace BroadcastsSchedule
                         }
                         else
                         {
-                            System.Windows.Forms.MessageBox.Show("Stream for " + CourseName + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            System.Windows.Forms.MessageBox.Show("Stream for " + broadcastData.streamTitle + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                             Broadcast = null;
                             return;
