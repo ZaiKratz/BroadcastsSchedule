@@ -20,6 +20,8 @@ namespace BroadcastsSchedule
 
     public partial class BroadcastsScheduleClass : Form
     {
+        private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> liveBroadcasts;
+
         private Google.Apis.YouTube.v3.Data.LiveBroadcast CurrentBroadcast = null;
         private Google.Apis.YouTube.v3.Data.LiveStream CurrentStream = null;
         private string YouTubeUser = null;
@@ -128,19 +130,22 @@ namespace BroadcastsSchedule
 
         private void BroadcastsScheduleClass_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(AuthServisesThread.IsAlive)
+            if (AuthServisesThread != null)
             {
-                AuthServisesThread.Abort();
-                AuthServisesThread = null;
-            } 
-
-            if (CurrentBroadcast != null)
-            {
-                if (CurrentBroadcast.Status.LifeCycleStatus.ToLower() != "complete")
+                if (AuthServisesThread.IsAlive)
                 {
-                    if (MessageBox.Show("You are streaming right now. Do you want to stop stream?", "Attention", MessageBoxButtons.YesNo) == DialogResult.No)
+                    AuthServisesThread.Abort();
+                    AuthServisesThread = null;
+                }
+
+                if (CurrentBroadcast != null)
+                {
+                    if (CurrentBroadcast.Status.LifeCycleStatus.ToLower() != "complete")
                     {
-                        e.Cancel = true;
+                        if (MessageBox.Show("You are streaming right now. Do you want to stop stream?", "Attention", MessageBoxButtons.YesNo) == DialogResult.No)
+                        {
+                            e.Cancel = true;
+                        }
                     }
                 }
             }
@@ -284,6 +289,16 @@ namespace BroadcastsSchedule
                         {
                             StartEventButton.Enabled = false;
                             StartEventButton.BackColor = System.Drawing.Color.LightGray;
+                        }
+                    )
+                );
+
+                ListOfStreams_Button.Invoke(
+                    new Action(
+                        delegate ()
+                        {
+                            ListOfStreams_Button.Enabled = false;
+                            ListOfStreams_Button.BackColor = System.Drawing.Color.LightGray;
                         }
                     )
                 );
@@ -536,19 +551,8 @@ namespace BroadcastsSchedule
             }
         }
 
-        private void CreateLiveEventAsync()
+        private BroadcastData GetBroadcastDataFromCells(DataGridViewRow row)
         {
-            CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
-            UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
-            AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = false; }));
-
-            StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
-            StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
-
-            CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = true; }));
-            CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.Red; }));
-            SetStatus("Creating YouTube Live Broadcast...");
-
             string StreamTitle = "";
             string Name = "";
             string Description = "";
@@ -567,7 +571,9 @@ namespace BroadcastsSchedule
                 new Action(
                     delegate ()
                     {
-                        Name = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[0].Value.ToString();
+                        
+                        Name = row.Cells[0].Value.ToString();
+                        //Name = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[0].Value.ToString();
                     }
                 )
             );
@@ -575,7 +581,8 @@ namespace BroadcastsSchedule
                 new Action(
                     delegate ()
                     {
-                        Description = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[3].Value.ToString();
+                        Description = row.Cells[3].Value.ToString();
+                        //Description = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[3].Value.ToString();
                     }
                 )
             );
@@ -585,8 +592,9 @@ namespace BroadcastsSchedule
                 new Action(
                     delegate ()
                     {
-                        string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[1].Value.ToString();
-                        if(tmp != null)
+                        string tmp = row.Cells[1].Value.ToString();
+                        //string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[1].Value.ToString();
+                        if (tmp != null)
                             Date = DateTime.Parse(tmp);
                     }
                 )
@@ -597,7 +605,8 @@ namespace BroadcastsSchedule
                 new Action(
                     delegate ()
                     {
-                        string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[2].Value.ToString();
+                        string tmp = row.Cells[2].Value.ToString();
+                        //string tmp = Lectures_GridView.Rows[Lectures_GridView.SelectedCells[0].RowIndex].Cells[2].Value.ToString();
                         if (tmp != null)
                             Time = DateTime.Parse(tmp);
                     }
@@ -613,16 +622,30 @@ namespace BroadcastsSchedule
                 scheduledDateTime = ScheduledDateTime,
                 broadcastDescription = Description
             };
+            return broadcastData;
+        }
 
-            GoogleYouTube.CreateLiveEvent(
-                ref CurrentBroadcast,
-                    broadcastData
-            );
+        private void CreateLiveEventAsync()
+        {
+            CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
+            UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
+            AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = false; }));
+
+            StartEventButton.Invoke(new Action(delegate () { StartEventButton.Enabled = false; }));
+            StartEventButton.Invoke(new Action(delegate () { StartEventButton.BackColor = System.Drawing.Color.LightGray; }));
+
+            CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = true; }));
+            CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.Red; }));
+            SetStatus("Creating YouTube Live Broadcast...");
+
+            BroadcastData broadcastData = GetBroadcastDataFromCells(Lectures_GridView.SelectedRows[0]);
+
+            CurrentBroadcast = GoogleYouTube.CreateLiveEvent(broadcastData);
 
             if (CurrentBroadcast != null)
             {
                 SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
-                CurrentStream = GoogleYouTube.GetStreamByTitle(StreamTitle);
+                CurrentStream = GoogleYouTube.GetStreamByTitle(broadcastData.streamTitle);
                 if (CurrentBroadcast != null)
                 {
                     CurrentBroadcast = GoogleYouTube.StartEvent(CurrentBroadcast.Id, CurrentStream.Id);
@@ -773,10 +796,37 @@ namespace BroadcastsSchedule
             CurrentStatusLabel.Text = Text;
         }
 
-        private void changeGoogleSpreadSheetsAccountToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ChangeGoogleSpreadSheetsAccountToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GoogleSpreadsheetAccount GoogleAcc = new GoogleSpreadsheetAccount();
             GoogleAcc.ShowDialog();
+        }
+
+        private void ListOfStreams_Button_Click(object sender, EventArgs e)
+        {
+            var SelectedRows = Lectures_GridView.SelectedCells;
+
+            liveBroadcasts = GoogleYouTube.CreateListOfLiveEvents(null);
+        }
+
+        private void Lectures_GridView_SelectionChanged(object sender, EventArgs e)
+        {
+            if (Lectures_GridView.SelectedRows.Count > 1)
+            {
+                ListOfStreams_Button.Enabled = true;
+                ListOfStreams_Button.BackColor = System.Drawing.Color.LimeGreen;
+
+                StartEventButton.Enabled = false;
+                StartEventButton.BackColor = System.Drawing.Color.LightGray;
+            }
+            else
+            { 
+                ListOfStreams_Button.Enabled = false;
+                ListOfStreams_Button.BackColor = System.Drawing.Color.LightGray;
+
+                StartEventButton.Enabled = true;
+                StartEventButton.BackColor = System.Drawing.Color.LimeGreen;
+            }
         }
     }
 

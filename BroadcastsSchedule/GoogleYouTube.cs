@@ -156,14 +156,24 @@ namespace BroadcastsSchedule
             return false;
         }
 
-        public static void CreateBunchOfLiveEvents()
+        public static List<LiveBroadcast> CreateListOfLiveEvents(List<BroadcastData> ListOfLiveEventsData)
         {
+            List<LiveBroadcast> liveBroadcasts = new List<LiveBroadcast>();
 
+            foreach(var Data in ListOfLiveEventsData)
+            {
+                LiveBroadcast liveBroadcast = CreateLiveEvent(Data);
+                if (liveBroadcast != null)
+                    liveBroadcasts.Add(liveBroadcast);
+            }
+
+            return liveBroadcasts;
         }
 
-        public static void CreateLiveEvent(ref LiveBroadcast Broadcast, BroadcastData broadcastData)
+        public static LiveBroadcast CreateLiveEvent(BroadcastData broadcastData)
         {
-            if(Service != null)
+            LiveBroadcast Broadcast = null;
+            if (Service != null)
             {
                 var Stream = GetStreamByTitle(broadcastData.streamTitle);
                 if(Stream != null)
@@ -208,7 +218,7 @@ namespace BroadcastsSchedule
                             System.Windows.Forms.MessageBox.Show("Stream for " + broadcastData.streamTitle + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                             Broadcast = null;
-                            return;
+                            return Broadcast;
                         }
 
                         var ListRequest = Service.Videos.List(BroadcastPart);
@@ -243,14 +253,14 @@ namespace BroadcastsSchedule
                         System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                         Broadcast = null;
-                        return;
+                        return Broadcast;
                     }
                     catch (System.Net.Http.HttpRequestException ex)
                     {
                         System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                         Broadcast = null;
-                        return;
+                        return Broadcast;
                     }
                 }
                 else
@@ -258,7 +268,7 @@ namespace BroadcastsSchedule
                     System.Windows.Forms.MessageBox.Show("Stream is not found.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                     Broadcast = null;
-                    return;
+                    return Broadcast;
                 }
             }
             else
@@ -266,6 +276,8 @@ namespace BroadcastsSchedule
                 Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
                 Broadcast = null;
             }
+
+            return Broadcast;
         }
 
         public static void GetStreams(ref List<LiveStream> StreamsList)
