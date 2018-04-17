@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
-
+using Google.Apis.YouTube.v3.Data;
 
 namespace BroadcastsSchedule
 {
@@ -55,7 +55,7 @@ namespace BroadcastsSchedule
             InitScheduledBroadcastsGrid();
             InitOnlineBroadcastsGrid();
 
-            //SetStatus("Select lecture and press \"Start Stream\" button");
+            SetStatus("Ready");
         }
 
         private void InitLecturesGrid()
@@ -300,7 +300,6 @@ namespace BroadcastsSchedule
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
             }
         }
-
 
         private void Authenticate()
         {
@@ -813,6 +812,10 @@ namespace BroadcastsSchedule
         {
             if (Lectures_GridView.Rows.Count > 0)
                 Lectures_GridView.Rows.Clear();
+            if (ScheduledBroadcasts_GridView.Rows.Count > 0)
+                ScheduledBroadcasts_GridView.Rows.Clear();
+            if (CurrentStreams_GridView.Rows.Count > 0)
+                CurrentStreams_GridView.Rows.Clear();
             if (EMailsList_ListView.Items.Count > 0)
                 EMailsList_ListView.Items.Clear();
             if (CoursesList_ComboBox.Items.Count > 0)
@@ -916,14 +919,18 @@ namespace BroadcastsSchedule
                     BroadcastData broadcastData = GetBroadcastDataFromCells(row);
                     SetStatus("Creating YouTube Live Broadcast: " + broadcastData.broadcastName);
                     data.Add(broadcastData);
+
                 }
             }
 
             if (data.Count > 0)
             {
-                liveBroadcasts = GoogleYouTube.CreateListOfLiveEvents(data);
-                if(liveBroadcasts.Count > 0)
+                var CreatedBroadcasts = GoogleYouTube.CreateListOfLiveEvents(data);
+
+                if(CreatedBroadcasts.Count > 0)
                 {
+                    AddDataToScheduledBroadcastsGrid(CreatedBroadcasts);
+
                     CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = true; }));
                     UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = true; }));
                     AccountsList_ComboBox.Invoke(new Action(delegate () { AccountsList_ComboBox.Enabled = true; }));
@@ -945,6 +952,36 @@ namespace BroadcastsSchedule
             }
         }
 
+        private void AddDataToScheduledBroadcastsGrid(List<LiveBroadcast> createdBroadcasts)
+        {
+            if (createdBroadcasts != null)
+            {
+                if (liveBroadcasts != null)
+                    liveBroadcasts.AddRange(createdBroadcasts);
+                else
+                    liveBroadcasts = new List<LiveBroadcast>(createdBroadcasts);
+
+                foreach (var broadcast in createdBroadcasts)
+                {
+                    var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
+                    ScheduledBroadcasts_GridView.Invoke(
+                        new Action(delegate ()
+                        {
+                            ScheduledBroadcasts_GridView.Rows.Add(
+                            broadcast.Snippet.Title.ToString(),
+                            Stream != null ? Stream.Snippet.Title : "unknown",
+                            broadcast.Snippet.PublishedAt.ToString(),
+                            broadcast.Snippet.ScheduledStartTime.ToString(),
+                            broadcast.Snippet.Description
+                            );
+                        }
+                        )
+                    );
+                }
+            }
+
+        }
+        
         private void Lectures_GridView_SelectionChanged(object sender, EventArgs e)
         {
             if (backgroundWorker.IsBusy) return;
