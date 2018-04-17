@@ -20,6 +20,7 @@ namespace BroadcastsSchedule
     public partial class BroadcastsScheduleClass : Form
     {
         private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> liveBroadcasts;
+        private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> onlineBroadcasts;
 
         private Google.Apis.YouTube.v3.Data.LiveBroadcast CurrentBroadcast = null;
         private Google.Apis.YouTube.v3.Data.LiveStream CurrentStream = null;
@@ -428,11 +429,13 @@ namespace BroadcastsSchedule
 
         private void UpdateScheduledBroadcastsListAsync()
         {
-            var broadcastsList = GoogleYouTube.GetScheduledBroadcasts();
+            if(liveBroadcasts != null)
+                liveBroadcasts.Clear();
+            liveBroadcasts = GoogleYouTube.GetScheduledBroadcasts();
 
-            if (broadcastsList != null)
+            if (liveBroadcasts != null)
             {
-                foreach (var broadcast in broadcastsList)
+                foreach (var broadcast in liveBroadcasts)
                 {
                     var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
                     
@@ -457,11 +460,13 @@ namespace BroadcastsSchedule
 
         private void UpdateOnlineBroadcastsListAsync()
         {
-            var broadcastsList = GoogleYouTube.GetOnlineBroadcasts();
+            if(onlineBroadcasts != null)
+                onlineBroadcasts.Clear();
+            onlineBroadcasts = GoogleYouTube.GetOnlineBroadcasts();
 
-            if (broadcastsList != null)
+            if (onlineBroadcasts != null)
             {
-                foreach (var broadcast in broadcastsList)
+                foreach (var broadcast in onlineBroadcasts)
                 {
                     var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
 
