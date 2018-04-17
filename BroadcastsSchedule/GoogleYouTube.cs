@@ -399,5 +399,59 @@ namespace BroadcastsSchedule
             }
             return null;
         }
+
+        public static List<LiveBroadcast> GetScheduledBroadcasts()
+        {
+            if (Service != null)
+            {
+                var Request = Service.LiveBroadcasts.List(BroadcastPart);
+                Request.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.Upcoming;
+
+                try
+                {
+                    var ReturnedResponce = Request.Execute();
+                    if (ReturnedResponce.Items.Count > 0)
+                        return ReturnedResponce.Items as List<LiveBroadcast>;
+                }
+                catch (Google.GoogleApiException e)
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
+                catch (System.Net.Http.HttpRequestException ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        public static List<LiveBroadcast> GetOnlineBroadcasts()
+        {
+            if (Service != null)
+            {
+                var Request = Service.LiveBroadcasts.List(BroadcastPart);
+                Request.BroadcastStatus = LiveBroadcastsResource.ListRequest.BroadcastStatusEnum.Active;
+
+                try
+                {
+                    var ReturnedResponce = Request.Execute();
+                    if (ReturnedResponce.Items.Count > 0)
+                        return ReturnedResponce.Items as List<LiveBroadcast>;
+                }
+                catch (Google.GoogleApiException e)
+                {
+                    System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
+                catch (System.Net.Http.HttpRequestException ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return null;
+                }
+            }
+            return null;
+        }
     }
 }

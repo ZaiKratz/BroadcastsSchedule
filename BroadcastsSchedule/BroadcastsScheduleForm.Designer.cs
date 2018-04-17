@@ -57,8 +57,8 @@
             this.CurrentStatus = new System.Windows.Forms.StatusStrip();
             this.CurrentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ListOfStreams_Button = new System.Windows.Forms.Button();
-            this.CurrentStreams_GridView = new System.Windows.Forms.DataGridView();
             this.ScheduledBroadcasts_GridView = new System.Windows.Forms.DataGridView();
+            this.CurrentStreams_GridView = new System.Windows.Forms.DataGridView();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.LecturesPage = new System.Windows.Forms.TabPage();
             this.ScheduledBroadcastsPage = new System.Windows.Forms.TabPage();
@@ -68,8 +68,8 @@
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Lectures_GridView)).BeginInit();
             this.CurrentStatus.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ScheduledBroadcasts_GridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.LecturesPage.SuspendLayout();
             this.ScheduledBroadcastsPage.SuspendLayout();
@@ -342,19 +342,6 @@
             this.ListOfStreams_Button.UseVisualStyleBackColor = true;
             this.ListOfStreams_Button.Click += new System.EventHandler(this.ListOfStreams_Button_Click);
             // 
-            // CurrentStreams_GridView
-            // 
-            this.CurrentStreams_GridView.AllowUserToAddRows = false;
-            this.CurrentStreams_GridView.AllowUserToDeleteRows = false;
-            this.CurrentStreams_GridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.CurrentStreams_GridView.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.CurrentStreams_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.CurrentStreams_GridView.Location = new System.Drawing.Point(6, 6);
-            this.CurrentStreams_GridView.Name = "CurrentStreams_GridView";
-            this.CurrentStreams_GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.CurrentStreams_GridView.Size = new System.Drawing.Size(633, 437);
-            this.CurrentStreams_GridView.TabIndex = 21;
-            // 
             // ScheduledBroadcasts_GridView
             // 
             this.ScheduledBroadcasts_GridView.AllowUserToAddRows = false;
@@ -364,9 +351,24 @@
             this.ScheduledBroadcasts_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ScheduledBroadcasts_GridView.Location = new System.Drawing.Point(6, 6);
             this.ScheduledBroadcasts_GridView.Name = "ScheduledBroadcasts_GridView";
+            this.ScheduledBroadcasts_GridView.ReadOnly = true;
             this.ScheduledBroadcasts_GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.ScheduledBroadcasts_GridView.Size = new System.Drawing.Size(633, 437);
-            this.ScheduledBroadcasts_GridView.TabIndex = 23;
+            this.ScheduledBroadcasts_GridView.TabIndex = 21;
+            // 
+            // CurrentStreams_GridView
+            // 
+            this.CurrentStreams_GridView.AllowUserToAddRows = false;
+            this.CurrentStreams_GridView.AllowUserToDeleteRows = false;
+            this.CurrentStreams_GridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.CurrentStreams_GridView.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.CurrentStreams_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.CurrentStreams_GridView.Location = new System.Drawing.Point(6, 6);
+            this.CurrentStreams_GridView.Name = "CurrentStreams_GridView";
+            this.CurrentStreams_GridView.ReadOnly = true;
+            this.CurrentStreams_GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.CurrentStreams_GridView.Size = new System.Drawing.Size(633, 437);
+            this.CurrentStreams_GridView.TabIndex = 23;
             // 
             // tabControl1
             // 
@@ -392,7 +394,7 @@
             // 
             // ScheduledBroadcastsPage
             // 
-            this.ScheduledBroadcastsPage.Controls.Add(this.CurrentStreams_GridView);
+            this.ScheduledBroadcastsPage.Controls.Add(this.ScheduledBroadcasts_GridView);
             this.ScheduledBroadcastsPage.Location = new System.Drawing.Point(4, 22);
             this.ScheduledBroadcastsPage.Name = "ScheduledBroadcastsPage";
             this.ScheduledBroadcastsPage.Padding = new System.Windows.Forms.Padding(3);
@@ -403,7 +405,7 @@
             // 
             // BroadcastsOnlinePage
             // 
-            this.BroadcastsOnlinePage.Controls.Add(this.ScheduledBroadcasts_GridView);
+            this.BroadcastsOnlinePage.Controls.Add(this.CurrentStreams_GridView);
             this.BroadcastsOnlinePage.Location = new System.Drawing.Point(4, 22);
             this.BroadcastsOnlinePage.Name = "BroadcastsOnlinePage";
             this.BroadcastsOnlinePage.Padding = new System.Windows.Forms.Padding(3);
@@ -452,8 +454,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.Lectures_GridView)).EndInit();
             this.CurrentStatus.ResumeLayout(false);
             this.CurrentStatus.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ScheduledBroadcasts_GridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.LecturesPage.ResumeLayout(false);
             this.ScheduledBroadcastsPage.ResumeLayout(false);
@@ -492,9 +494,9 @@
         private System.Windows.Forms.ToolStripStatusLabel CurrentStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem changeGoogleSpreadSheetsAccountToolStripMenuItem;
         private System.Windows.Forms.Button ListOfStreams_Button;
-        private System.Windows.Forms.DataGridView CurrentStreams_GridView;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.DataGridView ScheduledBroadcasts_GridView;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.DataGridView CurrentStreams_GridView;
         private AbortableBackgroundWorker abortableBackgroundWorker1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage LecturesPage;
