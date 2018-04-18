@@ -19,6 +19,8 @@ namespace BroadcastsSchedule
 
     public partial class BroadcastsScheduleClass : Form
     {
+        private DataGridView selectedGrid = null;
+
         private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> liveBroadcasts;
         private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> onlineBroadcasts;
 
@@ -40,6 +42,7 @@ namespace BroadcastsSchedule
 
         private void BroadcastsScheduleClass_Load(object sender, EventArgs e)
         {
+            
             UpdateAccountsList();
 
             if (AccountsList_ComboBox.Items.Count > 0)
@@ -54,8 +57,6 @@ namespace BroadcastsSchedule
             InitLecturesGrid();
             InitScheduledBroadcastsGrid();
             InitOnlineBroadcastsGrid();
-
-            SetStatus("Ready");
         }
 
         private void InitLecturesGrid()
@@ -93,7 +94,9 @@ namespace BroadcastsSchedule
 
         private void CoursesList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            SetStatus("Getting data from YouTube account. Please wait...");
             UpdateData();
+            SetStatus("Ready");
         }
         
         private void UpdateList_Click(object sender, EventArgs e)
@@ -148,10 +151,25 @@ namespace BroadcastsSchedule
 
         private void BackgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            if (Lectures_GridView.SelectedRows.Count == 1)
-                CreateLiveEventAsync();
+            if (selectedGrid.SelectedRows.Count == 1)
+            {
+                int SelectedIndex = 0;
+                tabControl.Invoke(new Action(delegate () { SelectedIndex = tabControl.SelectedIndex; }));
+                if(SelectedIndex == 0)
+                    CreateLiveEventAsync(selectedGrid);
+                else
+                {
+                    var broadcast = liveBroadcasts[selectedGrid.SelectedRows[0].Index];
+                    var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
+                    var startedSteam = GoogleYouTube.StartEvent(broadcast.Id, Stream.Id);
+                    if (startedSteam != null)
+                        onlineBroadcasts.Add(startedSteam);
+                    UpdateOnlineBroadcastsListAsync();
+                }
+            }
+                
             else
-                CreateListOfLiveBroadcasts();
+                CreateListOfLiveBroadcasts(selectedGrid);
         }
 
         private void BroadcastsScheduleClass_FormClosing(object sender, FormClosingEventArgs e)
@@ -305,6 +323,9 @@ namespace BroadcastsSchedule
         {
             lock (AuthLocker)
             {
+                string acc = null;
+                AccountsList_ComboBox.Invoke(new Action(delegate () { acc = AccountsList_ComboBox.SelectedItem.ToString(); }));
+                SetStatus("Logging into " + acc);
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = true; }));
                 UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
                 CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
@@ -357,6 +378,8 @@ namespace BroadcastsSchedule
                     return;
                 }
 
+                SetStatus("Login is completed");
+
                 AccountsList_ComboBox.Invoke(
                     new Action(
                         delegate ()
@@ -368,6 +391,7 @@ namespace BroadcastsSchedule
 
                 UpdateCoursesList();
                 CancelAuth.Invoke(new Action(delegate () { CancelAuth.Visible = false; }));
+                SetStatus("Ready");
                 Thread.Sleep(200);
             }
         }
@@ -429,7 +453,18 @@ namespace BroadcastsSchedule
         private void UpdateScheduledBroadcastsListAsync()
         {
             if(liveBroadcasts != null)
+            {
+                ScheduledBroadcasts_GridView.Invoke(
+                                   new Action(
+                                       delegate ()
+                                       {
+                                           ScheduledBroadcasts_GridView.Rows.Clear();
+                                       }
+                                   )
+                               );
                 liveBroadcasts.Clear();
+            }
+                
             liveBroadcasts = GoogleYouTube.GetScheduledBroadcasts();
 
             if (liveBroadcasts != null)
@@ -460,7 +495,18 @@ namespace BroadcastsSchedule
         private void UpdateOnlineBroadcastsListAsync()
         {
             if(onlineBroadcasts != null)
+            {
+                CurrentStreams_GridView.Invoke(
+                                     new Action(
+                                         delegate ()
+                                         {
+                                             CurrentStreams_GridView.Rows.Clear();
+                                         }
+                                     )
+                                 );
                 onlineBroadcasts.Clear();
+            }
+                
             onlineBroadcasts = GoogleYouTube.GetOnlineBroadcasts();
 
             if (onlineBroadcasts != null)
@@ -712,7 +758,7 @@ namespace BroadcastsSchedule
             return broadcastData;
         }
 
-        private void CreateLiveEventAsync()
+        private void CreateLiveEventAsync(DataGridView dataGridView)
         {
             CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
             UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
@@ -747,6 +793,14 @@ namespace BroadcastsSchedule
                 }
             }
 
+        }
+
+        private void StartBroadcast(string BroadcastID, string StreamID)
+        {
+            var createrBroadcast = GoogleYouTube.StartEvent(BroadcastID, StreamID);
+            if (createrBroadcast != null)
+                onlineBroadcasts.Add(createrBroadcast);
+            UpdateOnlineBroadcastsListAsync();
         }
 
         private void EndLiveEvent()
@@ -898,7 +952,7 @@ namespace BroadcastsSchedule
             backgroundWorker.RunWorkerAsync();
         }
 
-        private void CreateListOfLiveBroadcasts()
+        private void CreateListOfLiveBroadcasts(DataGridView dataGridView)
         {
             CoursesList_ComboBox.Invoke(new Action(delegate () { CoursesList_ComboBox.Enabled = false; }));
             UpdateButton.Invoke(new Action(delegate () { UpdateButton.Enabled = false; }));
@@ -911,13 +965,12 @@ namespace BroadcastsSchedule
             CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.Red; }));
 
             List<BroadcastData> data = new List<BroadcastData>();
-            var SelectedRows = Lectures_GridView.SelectedRows;
+            var SelectedRows = dataGridView.SelectedRows;
             foreach (var SelectedRow in SelectedRows)
             {
                 if (SelectedRow is DataGridViewRow row)
                 {
                     BroadcastData broadcastData = GetBroadcastDataFromCells(row);
-                    SetStatus("Creating YouTube Live Broadcast: " + broadcastData.broadcastName);
                     data.Add(broadcastData);
 
                 }
@@ -1003,6 +1056,43 @@ namespace BroadcastsSchedule
                 StartEventButton.BackColor = System.Drawing.Color.LimeGreen;
             }
         }
+
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (tabControl.SelectedIndex)
+            {
+                case 0:
+                    selectedGrid = Lectures_GridView;
+                    if (selectedGrid.SelectedRows.Count > 1)
+                    {
+                        ListOfStreams_Button.Enabled = true;
+                        ListOfStreams_Button.BackColor = System.Drawing.Color.LimeGreen;
+                    }
+                    else
+                    {
+                        ListOfStreams_Button.Enabled = false;
+                        ListOfStreams_Button.BackColor = System.Drawing.Color.LightGray;
+                    }
+                    break;
+                case 1:
+                    selectedGrid = ScheduledBroadcasts_GridView;
+                    ListOfStreams_Button.Enabled = false;
+                    ListOfStreams_Button.BackColor = System.Drawing.Color.LightGray;
+                    break;
+                case 2:
+                    selectedGrid = CurrentStreams_GridView;
+                    ListOfStreams_Button.Enabled = false;
+                    ListOfStreams_Button.BackColor = System.Drawing.Color.LightGray;
+                    break;
+            }
+        }
+
+        private void TabControl_HandleCreated(object sender, EventArgs e)
+        {
+            if (Lectures_GridView != null)
+                selectedGrid = Lectures_GridView;
+        }
+
     }
 
 

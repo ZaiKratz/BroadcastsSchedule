@@ -172,6 +172,7 @@ namespace BroadcastsSchedule
 
         public static LiveBroadcast CreateLiveEvent(BroadcastData broadcastData)
         {
+            Program.BSForm.SetStatus("Creatint Live Broadcast: " + broadcastData.broadcastName);
             LiveBroadcast Broadcast = null;
             if (Service != null)
             {
@@ -216,7 +217,7 @@ namespace BroadcastsSchedule
                         else
                         {
                             System.Windows.Forms.MessageBox.Show("Stream for " + broadcastData.streamTitle + " not found", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                            Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                            Program.BSForm.SetStatus("En error was occurred while creating broadcast " + broadcastData.broadcastName);
                             Broadcast = null;
                             return Broadcast;
                         }
@@ -251,14 +252,14 @@ namespace BroadcastsSchedule
                     catch (Google.GoogleApiException ex)
                     {
                         System.Windows.Forms.MessageBox.Show(ex.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                        Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                        Program.BSForm.SetStatus("En error was occurred while creating broadcast" + broadcastData.broadcastName);
                         Broadcast = null;
                         return Broadcast;
                     }
                     catch (System.Net.Http.HttpRequestException ex)
                     {
                         System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                        Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                        Program.BSForm.SetStatus("En error was occurred while creating broadcast" + broadcastData.broadcastName);
                         Broadcast = null;
                         return Broadcast;
                     }
@@ -266,17 +267,17 @@ namespace BroadcastsSchedule
                 else
                 {
                     System.Windows.Forms.MessageBox.Show("Stream is not found.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                    Program.BSForm.SetStatus("En error was occurred while creating broadcast" + broadcastData.broadcastName);
                     Broadcast = null;
                     return Broadcast;
                 }
             }
             else
             {
-                Program.BSForm.SetStatus("En error was occurred while creating broadcast. Cancel it and try again.");
+                Program.BSForm.SetStatus("En error was occurred while creating broadcast" + broadcastData.broadcastName);
                 Broadcast = null;
             }
-
+            Program.BSForm.SetStatus("Live Broadcast " + broadcastData.broadcastName + " was created");
             return Broadcast;
         }
 

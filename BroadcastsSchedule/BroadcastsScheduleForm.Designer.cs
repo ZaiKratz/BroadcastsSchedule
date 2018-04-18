@@ -59,7 +59,7 @@
             this.ListOfStreams_Button = new System.Windows.Forms.Button();
             this.ScheduledBroadcasts_GridView = new System.Windows.Forms.DataGridView();
             this.CurrentStreams_GridView = new System.Windows.Forms.DataGridView();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabControl = new System.Windows.Forms.TabControl();
             this.LecturesPage = new System.Windows.Forms.TabPage();
             this.ScheduledBroadcastsPage = new System.Windows.Forms.TabPage();
             this.BroadcastsOnlinePage = new System.Windows.Forms.TabPage();
@@ -70,7 +70,7 @@
             this.CurrentStatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ScheduledBroadcasts_GridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).BeginInit();
-            this.tabControl1.SuspendLayout();
+            this.tabControl.SuspendLayout();
             this.LecturesPage.SuspendLayout();
             this.ScheduledBroadcastsPage.SuspendLayout();
             this.BroadcastsOnlinePage.SuspendLayout();
@@ -370,16 +370,18 @@
             this.CurrentStreams_GridView.Size = new System.Drawing.Size(633, 437);
             this.CurrentStreams_GridView.TabIndex = 23;
             // 
-            // tabControl1
+            // tabControl
             // 
-            this.tabControl1.Controls.Add(this.LecturesPage);
-            this.tabControl1.Controls.Add(this.ScheduledBroadcastsPage);
-            this.tabControl1.Controls.Add(this.BroadcastsOnlinePage);
-            this.tabControl1.Location = new System.Drawing.Point(12, 84);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(653, 475);
-            this.tabControl1.TabIndex = 25;
+            this.tabControl.Controls.Add(this.LecturesPage);
+            this.tabControl.Controls.Add(this.ScheduledBroadcastsPage);
+            this.tabControl.Controls.Add(this.BroadcastsOnlinePage);
+            this.tabControl.Location = new System.Drawing.Point(12, 84);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(653, 475);
+            this.tabControl.TabIndex = 25;
+            this.tabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
+            tabControl.HandleCreated += new System.EventHandler(this.TabControl_HandleCreated);
             // 
             // LecturesPage
             // 
@@ -423,7 +425,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(853, 588);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this.ListOfStreams_Button);
             this.Controls.Add(this.CurrentStatus);
             this.Controls.Add(this.CancelAuth);
@@ -456,7 +458,7 @@
             this.CurrentStatus.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ScheduledBroadcasts_GridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentStreams_GridView)).EndInit();
-            this.tabControl1.ResumeLayout(false);
+            this.tabControl.ResumeLayout(false);
             this.LecturesPage.ResumeLayout(false);
             this.ScheduledBroadcastsPage.ResumeLayout(false);
             this.BroadcastsOnlinePage.ResumeLayout(false);
@@ -498,7 +500,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.DataGridView CurrentStreams_GridView;
         private AbortableBackgroundWorker abortableBackgroundWorker1;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage LecturesPage;
         private System.Windows.Forms.TabPage ScheduledBroadcastsPage;
         private System.Windows.Forms.TabPage BroadcastsOnlinePage;
