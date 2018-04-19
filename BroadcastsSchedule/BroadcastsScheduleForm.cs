@@ -32,17 +32,21 @@ namespace BroadcastsSchedule
 
         private Thread AuthServisesThread = null;
 
+        private System.Windows.Forms.Timer timer = null;
+        private int startTime;
+        private const int timerExpireIn = 300;
+
         public BroadcastsScheduleClass()
         {
             InitializeComponent();
 
             ToolTip ToolTip1 = new ToolTip();
             ToolTip1.SetToolTip(UpdateButton, "Update All");
+            timer = new System.Windows.Forms.Timer();
         }
 
         private void BroadcastsScheduleClass_Load(object sender, EventArgs e)
         {
-            
             UpdateAccountsList();
 
             if (AccountsList_ComboBox.Items.Count > 0)
@@ -57,6 +61,11 @@ namespace BroadcastsSchedule
             InitLecturesGrid();
             InitScheduledBroadcastsGrid();
             InitOnlineBroadcastsGrid();
+
+            timer.Tick += new EventHandler(OnCheckBroadcasts);
+            timer.Interval = timerExpireIn * 1000;
+            timer.Start();
+            startTime = DateTime.Now.Second;
         }
 
         private void InitLecturesGrid()
@@ -215,8 +224,8 @@ namespace BroadcastsSchedule
                     case "ready":
                     case "teststarting":
                     case "testing":
-                        GoogleYouTube.DeleteEvent(CurrentBroadcast.Id);
-                        break;
+                        //GoogleYouTube.DeleteEvent(CurrentBroadcast.Id);
+                        //break;
                     case "live":
                     case "livestarting":
                     case "reclaimed":
@@ -835,8 +844,8 @@ namespace BroadcastsSchedule
 
                 if (CurrentBroadcast != null)
                 {
-                    if(CurrentBroadcast.Id != null)
-                        if (GoogleYouTube.DeleteEvent(CurrentBroadcast.Id))
+                    //if (CurrentBroadcast.Id != null)
+                        //if (GoogleYouTube.DeleteEvent(CurrentBroadcast.Id))
                         {
                             CurrentBroadcast = null;
                             CurrentStream = null;
@@ -1086,6 +1095,34 @@ namespace BroadcastsSchedule
                     break;
             }
         }
+
+        private void OnCheckBroadcasts(object sender, EventArgs e)
+        {
+            UpdateData();
+            if (onlineBroadcasts != null)
+                CheckOnlineBroadcasts();
+        }
+
+        private void CheckOnlineBroadcasts()
+        {
+            foreach (var ob in onlineBroadcasts)
+            {
+                if (ob != null)
+                {
+                    var stream = GoogleYouTube.GetStreamByID(ob.ContentDetails.BoundStreamId);
+                    if (stream != null)
+                    {
+                        if(stream.Status.StreamStatus != "active")
+                        {
+                            GoogleYouTube.EndEvent(ob.Id);
+                            MessageBox.Show("Live broadcast " + ob.Snippet.Title + " is stopped due to lack of stream", "Information",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void TabControl_HandleCreated(object sender, EventArgs e)
         {
