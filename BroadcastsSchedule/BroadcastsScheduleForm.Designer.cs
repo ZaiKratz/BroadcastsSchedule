@@ -56,7 +56,7 @@
             this.CancelAuth = new System.Windows.Forms.Button();
             this.CurrentStatus = new System.Windows.Forms.StatusStrip();
             this.CurrentStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ListOfStreams_Button = new System.Windows.Forms.Button();
+            this.CreateStream_Button = new System.Windows.Forms.Button();
             this.ScheduledBroadcasts_GridView = new System.Windows.Forms.DataGridView();
             this.CurrentStreams_GridView = new System.Windows.Forms.DataGridView();
             this.tabControl = new System.Windows.Forms.TabControl();
@@ -339,20 +339,20 @@
             this.CurrentStatusLabel.Name = "CurrentStatusLabel";
             this.CurrentStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
-            // ListOfStreams_Button
+            // CreateStream_Button
             // 
-            this.ListOfStreams_Button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ListOfStreams_Button.BackColor = System.Drawing.Color.LimeGreen;
-            this.ListOfStreams_Button.FlatAppearance.BorderSize = 0;
-            this.ListOfStreams_Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ListOfStreams_Button.Location = new System.Drawing.Point(672, 394);
-            this.ListOfStreams_Button.Margin = new System.Windows.Forms.Padding(0);
-            this.ListOfStreams_Button.Name = "ListOfStreams_Button";
-            this.ListOfStreams_Button.Size = new System.Drawing.Size(128, 36);
-            this.ListOfStreams_Button.TabIndex = 20;
-            this.ListOfStreams_Button.Text = "Create list of streams";
-            this.ListOfStreams_Button.UseVisualStyleBackColor = true;
-            this.ListOfStreams_Button.Click += new System.EventHandler(this.ListOfStreams_Button_Click);
+            this.CreateStream_Button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CreateStream_Button.BackColor = System.Drawing.Color.LimeGreen;
+            this.CreateStream_Button.FlatAppearance.BorderSize = 0;
+            this.CreateStream_Button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CreateStream_Button.Location = new System.Drawing.Point(672, 394);
+            this.CreateStream_Button.Margin = new System.Windows.Forms.Padding(0);
+            this.CreateStream_Button.Name = "CreateStream_Button";
+            this.CreateStream_Button.Size = new System.Drawing.Size(128, 36);
+            this.CreateStream_Button.TabIndex = 20;
+            this.CreateStream_Button.Text = "Create stream";
+            this.CreateStream_Button.UseVisualStyleBackColor = true;
+            this.CreateStream_Button.Click += new System.EventHandler(this.ListOfStreams_Button_Click);
             // 
             // ScheduledBroadcasts_GridView
             // 
@@ -444,7 +444,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(854, 591);
             this.Controls.Add(this.tabControl);
-            this.Controls.Add(this.ListOfStreams_Button);
+            this.Controls.Add(this.CreateStream_Button);
             this.Controls.Add(this.CurrentStatus);
             this.Controls.Add(this.CancelAuth);
             this.Controls.Add(this.SelectedBroadcastSettingsLink);
@@ -514,7 +514,7 @@
         private System.Windows.Forms.StatusStrip CurrentStatus;
         private System.Windows.Forms.ToolStripStatusLabel CurrentStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem changeGoogleSpreadSheetsAccountToolStripMenuItem;
-        private System.Windows.Forms.Button ListOfStreams_Button;
+        private System.Windows.Forms.Button CreateStream_Button;
         private System.Windows.Forms.DataGridView ScheduledBroadcasts_GridView;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.DataGridView CurrentStreams_GridView;

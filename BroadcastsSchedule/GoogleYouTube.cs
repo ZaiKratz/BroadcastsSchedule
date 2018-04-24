@@ -428,7 +428,7 @@ namespace BroadcastsSchedule
             return null;
         }
 
-        public static List<LiveBroadcast> GetOnlineBroadcasts()
+        public static void GetOnlineBroadcasts(ref List<LiveBroadcast> list)
         {
             if (Service != null)
             {
@@ -439,20 +439,19 @@ namespace BroadcastsSchedule
                 {
                     var ReturnedResponce = Request.Execute();
                     if (ReturnedResponce.Items.Count > 0)
-                        return ReturnedResponce.Items as List<LiveBroadcast>;
+                        list = ReturnedResponce.Items as List<LiveBroadcast>;
                 }
                 catch (Google.GoogleApiException e)
                 {
                     System.Windows.Forms.MessageBox.Show(e.Error.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return null;
+                    return;
                 }
                 catch (System.Net.Http.HttpRequestException ex)
                 {
                     System.Windows.Forms.MessageBox.Show(ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    return null;
+                    return;
                 }
             }
-            return null;
         }
     }
 }
