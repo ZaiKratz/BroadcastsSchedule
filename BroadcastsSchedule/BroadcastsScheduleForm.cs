@@ -155,7 +155,7 @@ namespace BroadcastsSchedule
         private void StartLiveEvent_Click(object sender, EventArgs e)
         {
             if(!backgroundWorker.IsBusy)
-                backgroundWorker.RunWorkerAsync();
+                backgroundWorker.RunWorkerAsync(true);
         }
 
         private void EndLiveEventButton_Click(object sender, EventArgs e)
@@ -170,13 +170,15 @@ namespace BroadcastsSchedule
 
         private void BackgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
+            bool bStartStreaming = (bool)e.Argument;
             DisableButtons();
+           
             if (selectedGrid.SelectedRows.Count == 1)
             {
                 int SelectedIndex = 0;
                 tabControl.Invoke(new Action(delegate () { SelectedIndex = tabControl.SelectedIndex; }));
                 if(SelectedIndex == 0)
-                    CreateLiveEventAsync(selectedGrid.SelectedRows[0]);
+                    AddDataToScheduledBroadcastsGrid(CreateLiveEventAsync(selectedGrid.SelectedRows[0], bStartStreaming));
                 else
                 {
                     var broadcast = scheduledBroadcasts[selectedGrid.SelectedRows[0].Index];
@@ -449,7 +451,9 @@ namespace BroadcastsSchedule
                                         delegate ()
                                         {
                                             CoursesList_ComboBox.Items.AddRange(Item.ToArray());
-                                            foreach(var i in Item)
+                                            if (AvailableStreams.Count > 0)
+                                                AvailableStreams.Clear();
+                                            foreach (var i in Item)
                                             {
                                                 AvailableStreams.Add(i.ToString(), true);
                                             }
@@ -873,7 +877,7 @@ namespace BroadcastsSchedule
             return broadcastData;
         }
 
-        private LiveBroadcast CreateLiveEventAsync(DataGridViewRow dataGridViewRow)
+        private LiveBroadcast CreateLiveEventAsync(DataGridViewRow dataGridViewRow, bool bStart)
         {
             LiveBroadcast CurrentBroadcast = null;
             BroadcastData broadcastData = GetBroadcastDataFromCells(dataGridViewRow);
@@ -884,25 +888,25 @@ namespace BroadcastsSchedule
                     SetStatus("Creating YouTube Live Broadcast: " + broadcastData.broadcastName);
 
                     CurrentBroadcast = GoogleYouTube.CreateLiveEvent(broadcastData);
-
-                    if (CurrentBroadcast != null)
+                    if (bStart)
                     {
-                        SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
-                        var CurrentStream = GoogleYouTube.GetStreamByTitle(broadcastData.streamTitle);
                         if (CurrentBroadcast != null)
                         {
-                            StartBroadcast(CurrentBroadcast.Id, CurrentStream.Id);
-                            AvailableStreams[broadcastData.streamTitle] = false;
-                            CheckDataExists(selectedGrid);
-                            SetStatus("Ready");
-                            return CurrentBroadcast;
+                            SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
+                            var CurrentStream = GoogleYouTube.GetStreamByTitle(broadcastData.streamTitle);
+                            if (CurrentBroadcast != null)
+                            {
+                                StartBroadcast(CurrentBroadcast.Id, CurrentStream.Id);
+                                AvailableStreams[broadcastData.streamTitle] = false;
+                                return CurrentBroadcast;
+                            }
                         }
                     }
                 }
                 else
                 {
                     MessageBox.Show("You already start stream using stream " + broadcastData.streamTitle,
-                    "Atention", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    "Attention", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     SetStatus("You already start stream using stream " + broadcastData.streamTitle);
                 }
             }
@@ -1067,7 +1071,7 @@ namespace BroadcastsSchedule
 
         private void ListOfStreams_Button_Click(object sender, EventArgs e)
         {
-            backgroundWorker.RunWorkerAsync();
+            backgroundWorker.RunWorkerAsync(false);
         }
 
         private void CreateListOfLiveBroadcasts(DataGridView dataGridView)
@@ -1078,7 +1082,7 @@ namespace BroadcastsSchedule
             {
                 if (SelectedRow is DataGridViewRow row)
                 {
-                    AddDataToScheduledBroadcastsGrid(CreateLiveEventAsync(SelectedRow as DataGridViewRow));
+                    AddDataToScheduledBroadcastsGrid(CreateLiveEventAsync(SelectedRow as DataGridViewRow, false));
                 }
             }
         }
@@ -1141,7 +1145,7 @@ namespace BroadcastsSchedule
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            if (backgroundWorker.IsBusy) return;
             switch (tabControl.SelectedIndex)
             {
                 case 0:
@@ -1229,6 +1233,11 @@ namespace BroadcastsSchedule
         {
             if (Lectures_GridView != null)
                 selectedGrid = Lectures_GridView;
+        }
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SetStatus("Ready");
         }
     }
 
