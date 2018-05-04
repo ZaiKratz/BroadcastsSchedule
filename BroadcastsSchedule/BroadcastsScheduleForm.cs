@@ -19,9 +19,11 @@ namespace BroadcastsSchedule
 
     public partial class BroadcastsScheduleClass : Form
     {
+        Dictionary<string, bool> AvailableStreams;
+
         private DataGridView selectedGrid = null;
 
-        private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> liveBroadcasts;
+        private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> scheduledBroadcasts;
         private List<Google.Apis.YouTube.v3.Data.LiveBroadcast> onlineBroadcasts;
 
         //private Google.Apis.YouTube.v3.Data.LiveBroadcast CurrentBroadcast = null;
@@ -40,10 +42,11 @@ namespace BroadcastsSchedule
         {
             InitializeComponent();
 
+            AvailableStreams = new Dictionary<string, bool>();
             ToolTip ToolTip1 = new ToolTip();
             ToolTip1.SetToolTip(UpdateButton, "Update All");
             timer = new System.Windows.Forms.Timer();
-            liveBroadcasts = new List<LiveBroadcast>();
+            scheduledBroadcasts = new List<LiveBroadcast>();
             onlineBroadcasts = new List<LiveBroadcast>();
         }
 
@@ -173,10 +176,10 @@ namespace BroadcastsSchedule
                 int SelectedIndex = 0;
                 tabControl.Invoke(new Action(delegate () { SelectedIndex = tabControl.SelectedIndex; }));
                 if(SelectedIndex == 0)
-                    CreateLiveEventAsync(selectedGrid);
+                    CreateLiveEventAsync(selectedGrid.SelectedRows[0]);
                 else
                 {
-                    var broadcast = liveBroadcasts[selectedGrid.SelectedRows[0].Index];
+                    var broadcast = scheduledBroadcasts[selectedGrid.SelectedRows[0].Index];
                     var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
                     StartBroadcast(broadcast.Id, Stream.Id);
                 }
@@ -313,11 +316,6 @@ namespace BroadcastsSchedule
             WindowState = FormWindowState.Normal;
         }
 
-        private void BroadcastSettingsLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            //System.Diagnostics.Process.Start("https://www.youtube.com/my_live_events?event_id=" + CurrentBroadcast.Id + "&action_edit_live_event=1");
-        }
-
         private void CancelAuth_Click(object sender, EventArgs e)
         {
             if(AuthServisesThread.IsAlive)
@@ -451,6 +449,10 @@ namespace BroadcastsSchedule
                                         delegate ()
                                         {
                                             CoursesList_ComboBox.Items.AddRange(Item.ToArray());
+                                            foreach(var i in Item)
+                                            {
+                                                AvailableStreams.Add(i.ToString(), true);
+                                            }
                                         }
                                     )
                                 );
@@ -471,7 +473,7 @@ namespace BroadcastsSchedule
 
         private void UpdateScheduledBroadcastsListAsync()
         {
-            if(liveBroadcasts != null)
+            if(scheduledBroadcasts != null)
             {
                 ScheduledBroadcasts_GridView.Invoke(
                                    new Action(
@@ -481,14 +483,14 @@ namespace BroadcastsSchedule
                                        }
                                    )
                                );
-                liveBroadcasts.Clear();
+                scheduledBroadcasts.Clear();
             }
                 
-            liveBroadcasts = GoogleYouTube.GetScheduledBroadcasts();
+            scheduledBroadcasts = GoogleYouTube.GetScheduledBroadcasts();
 
-            if (liveBroadcasts != null)
+            if (scheduledBroadcasts != null)
             {
-                foreach (var broadcast in liveBroadcasts)
+                foreach (var broadcast in scheduledBroadcasts)
                 {
                     var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
                     
@@ -548,6 +550,7 @@ namespace BroadcastsSchedule
                                        }
                                    )
                                );
+                    AvailableStreams[Stream.Snippet.Title] = false;
                 }
             }
         }
@@ -870,26 +873,40 @@ namespace BroadcastsSchedule
             return broadcastData;
         }
 
-        private void CreateLiveEventAsync(DataGridView dataGridView)
+        private LiveBroadcast CreateLiveEventAsync(DataGridViewRow dataGridViewRow)
         {
-            BroadcastData broadcastData = GetBroadcastDataFromCells(Lectures_GridView.SelectedRows[0]);
-            SetStatus("Creating YouTube Live Broadcast: " + broadcastData.broadcastName);
-
-            var CurrentBroadcast = GoogleYouTube.CreateLiveEvent(broadcastData);
-
-            if (CurrentBroadcast != null)
+            LiveBroadcast CurrentBroadcast = null;
+            BroadcastData broadcastData = GetBroadcastDataFromCells(dataGridViewRow);
+            if (AvailableStreams.TryGetValue(broadcastData.streamTitle, out bool bIsStreamAvailable))
             {
-                SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
-                var CurrentStream = GoogleYouTube.GetStreamByTitle(broadcastData.streamTitle);
-                if (CurrentBroadcast != null)
+                if (bIsStreamAvailable)
                 {
-                    StartBroadcast(CurrentBroadcast.Id, CurrentStream.Id);
-                    CheckDataExists(selectedGrid);
-                    CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.Enabled = false; }));
-                    CancelEventButton.Invoke(new Action(delegate () { CancelEventButton.BackColor = System.Drawing.Color.LightGray; }));
+                    SetStatus("Creating YouTube Live Broadcast: " + broadcastData.broadcastName);
+
+                    CurrentBroadcast = GoogleYouTube.CreateLiveEvent(broadcastData);
+
+                    if (CurrentBroadcast != null)
+                    {
+                        SelectedBroadcastSettingsLink.Invoke(new Action(delegate () { SelectedBroadcastSettingsLink.Enabled = true; }));
+                        var CurrentStream = GoogleYouTube.GetStreamByTitle(broadcastData.streamTitle);
+                        if (CurrentBroadcast != null)
+                        {
+                            StartBroadcast(CurrentBroadcast.Id, CurrentStream.Id);
+                            AvailableStreams[broadcastData.streamTitle] = false;
+                            CheckDataExists(selectedGrid);
+                            SetStatus("Ready");
+                            return CurrentBroadcast;
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("You already start stream using stream " + broadcastData.streamTitle,
+                    "Atention", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    SetStatus("You already start stream using stream " + broadcastData.streamTitle);
                 }
             }
-
+            return CurrentBroadcast;
         }
 
         private void DisableButtons()
@@ -926,9 +943,12 @@ namespace BroadcastsSchedule
 
         private void StartBroadcast(string BroadcastID, string StreamID)
         {
-            var createrBroadcast = GoogleYouTube.StartEvent(BroadcastID, StreamID);
-            if (createrBroadcast != null)
-                onlineBroadcasts.Add(createrBroadcast);
+            var createdBroadcast = GoogleYouTube.StartEvent(BroadcastID, StreamID);
+            if (createdBroadcast != null)
+            {
+                onlineBroadcasts.Add(createdBroadcast);
+               
+            }
             UpdateOnlineBroadcastsListAsync();
         }
 
@@ -1058,49 +1078,35 @@ namespace BroadcastsSchedule
             {
                 if (SelectedRow is DataGridViewRow row)
                 {
-                    BroadcastData broadcastData = GetBroadcastDataFromCells(row);
-                    data.Add(broadcastData);
-
-                }
-            }
-
-            if (data.Count > 0)
-            {
-                var CreatedBroadcasts = GoogleYouTube.CreateListOfLiveEvents(data);
-
-                if(CreatedBroadcasts.Count > 0)
-                {
-                    AddDataToScheduledBroadcastsGrid(CreatedBroadcasts);
+                    AddDataToScheduledBroadcastsGrid(CreateLiveEventAsync(SelectedRow as DataGridViewRow));
                 }
             }
         }
 
-        private void AddDataToScheduledBroadcastsGrid(List<LiveBroadcast> createdBroadcasts)
+        private void AddDataToScheduledBroadcastsGrid(LiveBroadcast createdBroadcast)
         {
-            if (createdBroadcasts != null)
+            if (createdBroadcast != null)
             {
-                if (liveBroadcasts != null)
-                    liveBroadcasts.AddRange(createdBroadcasts);
+                if (scheduledBroadcasts != null)
+                    scheduledBroadcasts.Add(createdBroadcast);
                 else
-                    liveBroadcasts = new List<LiveBroadcast>(createdBroadcasts);
+                    scheduledBroadcasts = new List<LiveBroadcast> { createdBroadcast };
 
-                foreach (var broadcast in createdBroadcasts)
-                {
-                    var Stream = GoogleYouTube.GetStreamByID(broadcast.ContentDetails.BoundStreamId);
+                    var Stream = GoogleYouTube.GetStreamByID(createdBroadcast.ContentDetails.BoundStreamId);
                     ScheduledBroadcasts_GridView.Invoke(
                         new Action(delegate ()
                         {
                             ScheduledBroadcasts_GridView.Rows.Add(
-                            broadcast.Snippet.Title.ToString(),
+                            createdBroadcast.Snippet.Title.ToString(),
                             Stream != null ? Stream.Snippet.Title : "unknown",
-                            broadcast.Snippet.PublishedAt.ToString(),
-                            broadcast.Snippet.ScheduledStartTime.ToString(),
-                            broadcast.Snippet.Description
+                            createdBroadcast.Snippet.PublishedAt.ToString(),
+                            createdBroadcast.Snippet.ScheduledStartTime.ToString(),
+                            createdBroadcast.Snippet.Description
                             );
                         }
                         )
                     );
-                }
+                
             }
 
         }
@@ -1109,42 +1115,87 @@ namespace BroadcastsSchedule
         {
             if (backgroundWorker.IsBusy) return;
 
-//             if (Lectures_GridView.SelectedRows.Count > 1)
-//             {
-//                 CreateStream_Button.Enabled = true;
-//                 CreateStream_Button.BackColor = System.Drawing.Color.LimeGreen;
-// 
-//                 StartEventButton.Enabled = false;
-//                 StartEventButton.BackColor = System.Drawing.Color.LightGray;
-//             }
-//             else
-//             { 
-//                 CreateStream_Button.Enabled = false;
-//                 CreateStream_Button.BackColor = System.Drawing.Color.LightGray;
-// 
-//                 StartEventButton.Enabled = true;
-//                 StartEventButton.BackColor = System.Drawing.Color.LimeGreen;
-//             }
+            if (Lectures_GridView.SelectedRows.Count > 1)
+            {
+                StartEventButton.Enabled = false;
+                StartEventButton.BackColor = System.Drawing.Color.LightGray;
+            }
+            else
+            {
+                StartEventButton.Enabled = true;
+                StartEventButton.BackColor = System.Drawing.Color.LimeGreen;
+            }
+        }
+
+        private void ScheduledBroadcastSettings(object o, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.youtube.com/my_live_events?event_id="
+                                + scheduledBroadcasts[selectedGrid.SelectedRows[0].Index].Id + "&action_edit_live_event=1");
+        }
+
+        private void OnlineBroadcastSettings(object o, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.youtube.com/my_live_events?event_id="
+                                + onlineBroadcasts[selectedGrid.SelectedRows[0].Index].Id + "&action_edit_live_event=1");
         }
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             switch (tabControl.SelectedIndex)
             {
                 case 0:
                     selectedGrid = Lectures_GridView;
+                    if (CheckDataExists(selectedGrid))
+                    {
+                        SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = false;
+                    }
+                    else
+                    {
+                        SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = false;
+                    }
                     break;
                 case 1:
                     selectedGrid = ScheduledBroadcasts_GridView;
+                    if (CheckDataExists(selectedGrid))
+                    {
+                        SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click += ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = true;
+                    }
+                    else
+                    {
+                        SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = false;
+                    }
                     break;
                 case 2:
                     selectedGrid = CurrentStreams_GridView;
+                    if (CheckDataExists(selectedGrid))
+                    {
+                        SelectedBroadcastSettingsLink.Click += OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = true;
+                    }
+                    else
+                    {
+                        SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                        SelectedBroadcastSettingsLink.Enabled = false;
+                    }
                     break;
                 default:
                     selectedGrid = null;
+                    SelectedBroadcastSettingsLink.Click -= ScheduledBroadcastSettings;
+                    SelectedBroadcastSettingsLink.Click -= OnlineBroadcastSettings;
+                    SelectedBroadcastSettingsLink.Enabled = false;
                     break;
             }
-            CheckDataExists(selectedGrid);
         }
 
         private void OnCheckBroadcasts(object sender, EventArgs e)
@@ -1174,13 +1225,11 @@ namespace BroadcastsSchedule
             }
         }
 
-
         private void TabControl_HandleCreated(object sender, EventArgs e)
         {
             if (Lectures_GridView != null)
                 selectedGrid = Lectures_GridView;
         }
-
     }
 
 

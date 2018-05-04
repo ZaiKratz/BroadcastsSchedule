@@ -204,6 +204,7 @@
             // 
             this.Lectures_GridView.AllowUserToAddRows = false;
             this.Lectures_GridView.AllowUserToDeleteRows = false;
+            this.Lectures_GridView.AllowUserToOrderColumns = true;
             this.Lectures_GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -308,7 +309,6 @@
             this.SelectedBroadcastSettingsLink.TabStop = true;
             this.SelectedBroadcastSettingsLink.Text = "Selected broadcast settings";
             this.SelectedBroadcastSettingsLink.VisitedLinkColor = System.Drawing.Color.Blue;
-            this.SelectedBroadcastSettingsLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.BroadcastSettingsLink_LinkClicked);
             // 
             // CancelAuth
             // 
@@ -358,6 +358,7 @@
             // 
             this.ScheduledBroadcasts_GridView.AllowUserToAddRows = false;
             this.ScheduledBroadcasts_GridView.AllowUserToDeleteRows = false;
+            this.ScheduledBroadcasts_GridView.AllowUserToOrderColumns = true;
             this.ScheduledBroadcasts_GridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -365,6 +366,7 @@
             this.ScheduledBroadcasts_GridView.BackgroundColor = System.Drawing.SystemColors.Window;
             this.ScheduledBroadcasts_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ScheduledBroadcasts_GridView.Location = new System.Drawing.Point(6, 6);
+            this.ScheduledBroadcasts_GridView.MultiSelect = false;
             this.ScheduledBroadcasts_GridView.Name = "ScheduledBroadcasts_GridView";
             this.ScheduledBroadcasts_GridView.ReadOnly = true;
             this.ScheduledBroadcasts_GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -379,6 +381,7 @@
             this.CurrentStreams_GridView.BackgroundColor = System.Drawing.SystemColors.Window;
             this.CurrentStreams_GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.CurrentStreams_GridView.Location = new System.Drawing.Point(6, 6);
+            this.CurrentStreams_GridView.MultiSelect = false;
             this.CurrentStreams_GridView.Name = "CurrentStreams_GridView";
             this.CurrentStreams_GridView.ReadOnly = true;
             this.CurrentStreams_GridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
