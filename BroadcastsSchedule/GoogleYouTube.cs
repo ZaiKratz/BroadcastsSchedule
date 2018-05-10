@@ -53,6 +53,7 @@ namespace BroadcastsSchedule
         public static LiveBroadcast StartEvent(string BroadcastId, string StreamId)
         {
             LiveBroadcast Broadcast = null;
+            
             if (Service != null)
             {
                 Program.BSForm.SetStatus("Checking for OBS connection...");
@@ -197,16 +198,30 @@ namespace BroadcastsSchedule
                         ContentDetails = new LiveBroadcastContentDetails
                         {
                             RecordFromStart = true,
-                            EnableDvr = true
+                            EnableDvr = true,
+                            EnableLowLatency = true
+                            
                         },
+                        
 
                         Kind = "youtube#liveBroadcast"
                     };
-
+                    
                     try
                     {
                         LiveBroadcastsResource.InsertRequest InsertRequest = Service.LiveBroadcasts.Insert(Broadcast, BroadcastPart);
                         Broadcast = InsertRequest.Execute();
+
+                        Program.BSForm.SetStatus("Setting up live chat...");
+                        Broadcast.Snippet.Description +=
+                            Environment.NewLine +
+                            "Live Chat link: " +
+                            "https://www.youtube.com/live_chat?v=" + Broadcast.Id;
+
+                        var UpdateChatID = Service.LiveBroadcasts.Update(Broadcast, BroadcastPart);
+                        UpdateChatID.Execute();
+                        Program.BSForm.SetStatus("Live chat is ready");
+
 
                         if (Stream != null)
                         {
@@ -230,6 +245,8 @@ namespace BroadcastsSchedule
                         foreach (var BroadcastVideo in ListResponce.Items)
                         {
                             BroadcastVideo.Snippet.CategoryId = "27";
+                            BroadcastVideo.Snippet.DefaultLanguage = "ru";
+                            BroadcastVideo.Snippet.DefaultAudioLanguage = "ru";
                             var UpdateRequest = Service.Videos.Update(BroadcastVideo, BroadcastPart);
                             UpdateRequest.Execute();
                         }
